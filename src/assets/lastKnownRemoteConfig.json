@@ -132,9 +132,9 @@
       }
     },
     "transferInfo": {
-      "formSelector": "*[class*=ItemTransferPage] form",
+      "formSelector": "body[data-supersea-path^=\"/assets/\"][data-supersea-path$=\"/transfer\"] form",
       "node": {
-        "selector": "*[class*=ItemTransferPage] form i[value=report_problem]",
+        "selector": "body[data-supersea-path^=\"/assets/\"][data-supersea-path$=\"/transfer\"] form i[value=report_problem]",
         "injectionMethod": "insertBefore"
       }
     },
@@ -159,15 +159,15 @@
       },
       "list": {
         "node": {
-          "selector": "div[role=\"listitem\"] .AssetCell--container",
+          "selector": "div[role=\"listitem\"] .AssetCell--container, div[role=\"listitem\"] .sc-q7w47o-0",
           "injectionMethod": "prepend"
         },
         "link": {
-          "selector": ".AssetCell--link",
+          "selector": "a[href^=\"/assets\"]",
           "hierarchy": "either"
         },
         "collectionLink": {
-          "selector": ".CollectionLink--link",
+          "selector": "a[href^=\"/collection\"]",
           "hierarchy": "either"
         },
         "image": {
@@ -181,7 +181,7 @@
           "injectionMethod": "append"
         },
         "link": {
-          "selector": ".AssetCell--link",
+          "selector": "a[href^=\"/assets\"]",
           "hierarchy": "child"
         },
         "collectionLink": {
@@ -195,19 +195,19 @@
       },
       "sell": {
         "node": {
-          "selector": "article[class*=AssetSellPreview]",
+          "selector": "article.sc-1hvmhz3-2",
           "injectionMethod": "append"
         },
         "link": {
-          "selector": ".AssetCell--link",
+          "selector": "a[href^=\"/assets\"]",
           "hierarchy": "child"
         },
         "collectionLink": {
-          "selector": ".AssetSellPreviewFooter--collection-name",
-          "hierarchy": "outside"
+          "selector": "a[href^=\"/collection\"]",
+          "hierarchy": "child"
         },
         "image": {
-          "selector": ".Image--image",
+          "selector": ".AssetMedia--img img",
           "hierarchy": "child"
         }
       }
@@ -225,7 +225,7 @@
     },
     "collectionStats": {
       "node": {
-        "selector": "body[data-supersea-path^=\"/collection/\"] .sc-1y1ib3i-3 ",
+        "selector": "body[data-supersea-path^=\"/collection/\"] .sc-1y1ib3i-3",
         "injectionMethod": "insertAfter"
       }
     },

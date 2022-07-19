@@ -21,12 +21,15 @@ div[role='list'] div[role='listitem'] {
 }
 
 *[role='listitem'] *[width='300px']:nth-child(2),
-*[role='listitem'] *[width='150px']:nth-child(2) {
+*[role='listitem'] *[width='150px']:nth-child(2),
+.sc-12irlp3-1 *[width='300px']:nth-child(2),
+.sc-12irlp3-1 *[width='150px']:nth-child(2) {
   width: 500px !important;
   flex: 0 0 500px !important;
 }
 
-div[role='listitem'] .AssetCell--container {
+div[role='listitem'] .AssetCell--container,
+div[role='listitem'] .sc-q7w47o-0 {
   padding-left: 190px;
   position: relative;
 }
@@ -34,7 +37,8 @@ div[role='listitem'] .AssetCell--container {
 div[role='list']
   div[role='listitem']
   .AssetCell--container
-  .SuperSea__AssetInfo {
+  .SuperSea__AssetInfo,
+div[role='list'] div[role='listitem'] .sc-q7w47o-0 .SuperSea__AssetInfo {
   z-index: 1;
   min-width: 190px;
   position: absolute;
