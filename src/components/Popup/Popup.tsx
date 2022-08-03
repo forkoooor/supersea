@@ -184,7 +184,7 @@ const Popup = () => {
           fontWeight="500"
           opacity={0.9}
         >
-          Non Fungible Tools
+          Non-Fungible Tools
         </Link>
         <Flex>
           <IconButton
