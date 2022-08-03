@@ -219,7 +219,7 @@
     },
     "profileSummary": {
       "node": {
-        "selector": "body:not([data-supersea-path^=\"/collection/\"]):not([data-supersea-path=\"\"]) ul.sc-151637b-0",
+        "selector": "body:not([data-supersea-path^=\"/collection/\"]):not([data-supersea-path=\"\"]) ul.sc-151637b-1",
         "injectionMethod": "insertBefore"
       }
     },
@@ -230,7 +230,7 @@
       }
     },
     "searchResults": {
-      "menuSelector": "body[data-supersea-path^=\"/collection/\"] ul.sc-151637b-0",
+      "menuSelector": "body[data-supersea-path^=\"/collection/\"] ul.sc-151637b-1 .sc-151637b-2",
       "containerSelector": ".AssetSearchView--main, .collection--ActivityTabSection"
     },
     "listingNotifier": {

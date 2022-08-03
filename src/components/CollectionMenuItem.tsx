@@ -14,7 +14,7 @@ const CollectionMenuItem = ({
     <HStack
       height="100%"
       spacing="4"
-      fontSize="18px"
+      fontSize="16px"
       fontWeight="600"
       pb="10px"
       borderBottom="2px solid transparent"
