@@ -110,10 +110,7 @@ const injectAssetInfo = async () => {
           address: address.toLowerCase(),
           tokenId: tokenId,
           collectionSlug,
-          chain:
-            tokenType === 'matic'
-              ? ('polygon' as const)
-              : ('ethereum' as const),
+          chain: tokenType === 'matic' ? 'polygon' : tokenType,
         }
       }
       if (type === 'sell') {
@@ -123,10 +120,7 @@ const injectAssetInfo = async () => {
           address: address.toLowerCase(),
           tokenId: tokenId,
           collectionSlug,
-          chain:
-            tokenType === 'matic'
-              ? ('polygon' as const)
-              : ('ethereum' as const),
+          chain: tokenType === 'matic' ? 'polygon' : tokenType,
         }
       }
 
@@ -143,10 +137,7 @@ const injectAssetInfo = async () => {
           address,
           tokenId,
           collectionSlug,
-          chain:
-            tokenType === 'matic'
-              ? ('polygon' as const)
-              : ('ethereum' as const),
+          chain: tokenType === 'matic' ? 'polygon' : tokenType,
         }
       }
       return {}

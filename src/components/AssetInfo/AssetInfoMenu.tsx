@@ -54,7 +54,7 @@ const AssetInfoMenu = ({
   address: string
   tokenId: string
   collectionSlug?: string
-  chain: Chain
+  chain: string
   queueRefresh: () => void
   replaceImage: () => void
   isAccountPage: boolean

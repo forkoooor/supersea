@@ -62,7 +62,7 @@ const AssetInfo = ({
   tokenId: string
   collectionSlug?: string
   type: 'grid' | 'list' | 'item' | 'sell'
-  chain: Chain
+  chain: string
   container: HTMLElement
   displayedPrice?: string
   quickBuyGasOverride?: null | { fee: number; priorityFee: number }
