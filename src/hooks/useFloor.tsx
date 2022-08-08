@@ -36,7 +36,7 @@ const loadFloor = async (slug: string, onReload: () => void) => {
   }
 }
 
-const useFloor = (collectionSlug?: string, chain: Chain = 'ethereum') => {
+const useFloor = (collectionSlug?: string, chain: string = 'ethereum') => {
   const [loading, setLoading] = useState(chain === 'ethereum' ? true : false)
   const [floor, setFloor] = useState<Floor | null | undefined>(
     chain === 'ethereum' ? undefined : null,

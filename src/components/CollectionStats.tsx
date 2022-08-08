@@ -194,7 +194,7 @@ const CollectionStats = ({ collectionSlug }: { collectionSlug: string }) => {
             </StatNumber>
           </Stat>
           <Stat>
-            <StatLabel mb="1">Royalty</StatLabel>
+            <StatLabel mb="1">Creator Royalty</StatLabel>
             <StatNumber fontSize="xl">
               {collection ? (
                 <Tooltip
