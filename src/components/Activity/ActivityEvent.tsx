@@ -18,7 +18,7 @@ export type Event = {
   tokenId: string
   contractAddress: string
   sellerAddress: string
-  blockExplorerLink: string
+  blockExplorerLink?: string
   chain: Chain
   name: string
   image: string

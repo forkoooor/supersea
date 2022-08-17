@@ -27,7 +27,9 @@ class OpenSeaStream extends EventTarget {
       tokenId,
       contractAddress,
       sellerAddress: event.payload.maker.address,
-      blockExplorerLink: `https://etherscan.io/tx/${event.payload.transaction.hash}`,
+      blockExplorerLink: event.payload.transaction
+        ? `https://etherscan.io/tx/${event.payload.transaction.hash}`
+        : undefined,
       chain: chain as Chain,
       name: event.payload.item.metadata.name || `#${tokenId}`,
       image: event.payload.item.metadata.image_url,
