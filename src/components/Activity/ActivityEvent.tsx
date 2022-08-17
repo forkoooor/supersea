@@ -8,11 +8,17 @@ import EthereumIcon from '../EthereumIcon'
 import { Chain } from '../../utils/api'
 import InternalLink from '../InternalLink'
 import ImageZoom from '../ImageZoom'
+import { PendingTransaction as PendingTransactionType } from '../../hooks/usePendingTransactions'
+import PendingTransactions from './PendingTransactions'
+import { Sale } from '../../hooks/useActivity'
+import Sold from './Sold'
 
 export type Event = {
   listingId: string
   tokenId: string
   contractAddress: string
+  sellerAddress: string
+  blockExplorerLink: string
   chain: Chain
   name: string
   image: string
@@ -23,8 +29,17 @@ export type Event = {
 }
 
 const ActivityEvent = memo(
-  ({ event }: { event: Event }) => {
+  ({
+    event,
+    pendingTransactions,
+    sale,
+  }: {
+    event: Event
+    pendingTransactions?: PendingTransactionType[]
+    sale?: Sale
+  }) => {
     const [container, setContainer] = useState<HTMLDivElement | null>(null)
+
     return (
       <HStack
         spacing="1"
@@ -56,15 +71,18 @@ const ActivityEvent = memo(
           justifyContent="space-between"
         >
           <HStack spacing="3">
-            <ImageZoom>
-              <Image
-                src={event.image}
-                width="48px"
-                height="48px"
-                borderRadius="md"
-                className="SuperSea__Image"
-              />
-            </ImageZoom>
+            <Box flex="0 0 48px" width="48px" height="48px">
+              <ImageZoom>
+                <Image
+                  src={event.image}
+                  width="48px"
+                  height="48px"
+                  flex="0 0 48px"
+                  borderRadius="md"
+                  className="SuperSea__Image"
+                />
+              </ImageZoom>
+            </Box>
             <Box>
               <InternalLink
                 route="asset"
@@ -75,7 +93,17 @@ const ActivityEvent = memo(
                   tokenId: event.tokenId,
                 }}
               >
-                <Text my="0" fontSize="sm" fontWeight="500">
+                <Text
+                  my="0"
+                  fontSize="sm"
+                  fontWeight="500"
+                  maxWidth="150px"
+                  textAlign="left"
+                  overflow="hidden"
+                  textOverflow="ellipsis"
+                  whiteSpace="nowrap"
+                  css={{ direction: 'rtl' }}
+                >
                   {event.name}
                 </Text>
               </InternalLink>
@@ -85,30 +113,76 @@ const ActivityEvent = memo(
             </Box>
           </HStack>
           <HStack spacing="4">
-            <VStack spacing="0" alignItems="flex-end" justifyContent="center">
-              <Text
-                fontWeight="semibold"
-                fontSize="sm"
+            {event.eventType === 'CREATED' && !sale && (
+              <PendingTransactions
+                pendingTransactions={pendingTransactions?.filter(
+                  ({ addedAt }) => {
+                    return addedAt >= +new Date(event.timestamp + 'Z') - 5000
+                  },
+                )}
+              />
+            )}
+            {sale && <Sold sale={sale} />}
+            <HStack
+              spacing="4"
+              opacity={sale && event.eventType === 'CREATED' ? 0.5 : 1}
+            >
+              <VStack spacing="0" alignItems="flex-end" justifyContent="center">
+                <Text
+                  fontWeight="semibold"
+                  fontSize="sm"
+                  color={
+                    event.eventType === 'CREATED' ? 'green.400' : 'red.400'
+                  }
+                >
+                  {(() => {
+                    if (event.eventType === 'CREATED' && sale) {
+                      return (
+                        <Text as="span" textDecoration="line-through">
+                          Listed
+                        </Text>
+                      )
+                    }
+                    return event.eventType === 'CREATED' ? 'Listed' : 'Sold'
+                  })()}
+                </Text>
+                <Flex
+                  alignItems="center"
+                  minWidth="60px"
+                  justifyContent="flex-end"
+                >
+                  <EthereumIcon
+                    mx="0.5em"
+                    wrapped={event.currency === 'WETH'}
+                  />
+                  <Text
+                    fontWeight="600"
+                    textDecoration={
+                      sale && event.eventType === 'CREATED'
+                        ? 'line-through'
+                        : 'none'
+                    }
+                  >
+                    {readableEthValue(+event.price)}
+                  </Text>
+                </Flex>
+              </VStack>
+              <Icon
+                as={event.eventType === 'CREATED' ? FaTag : FaShoppingCart}
                 color={event.eventType === 'CREATED' ? 'green.400' : 'red.400'}
-              >
-                {event.eventType === 'CREATED' ? 'Listed' : 'Sold'}
-              </Text>
-              <Flex alignItems="center">
-                <EthereumIcon mx="0.5em" wrapped={event.currency === 'WETH'} />
-                <Text fontWeight="600">{readableEthValue(+event.price)}</Text>
-              </Flex>
-            </VStack>
-            <Icon
-              as={event.eventType === 'CREATED' ? FaTag : FaShoppingCart}
-              color={event.eventType === 'CREATED' ? 'green.400' : 'red.400'}
-            />
+              />
+            </HStack>
           </HStack>
         </HStack>
       </HStack>
     )
   },
   (prev, next) => {
-    return prev.event.listingId === next.event.listingId
+    return (
+      prev.event.listingId === next.event.listingId &&
+      Boolean(prev.sale) === Boolean(next.sale) &&
+      prev.pendingTransactions?.length === next.pendingTransactions?.length
+    )
   },
 )
 

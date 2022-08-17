@@ -4,7 +4,6 @@ import {
   Flex,
   Text,
   Image,
-  LinkOverlay,
   Circle,
   useColorModeValue,
 } from '@chakra-ui/react'
@@ -17,11 +16,16 @@ import { Chain } from '../../utils/api'
 import { Notifier } from './ListingNotifierForm'
 import InternalLink from '../InternalLink'
 import ImageZoom from '../ImageZoom'
+import { PendingTransaction as PendingTransactionType } from '../../hooks/usePendingTransactions'
+import PendingTransactions from './PendingTransactions'
+import { Sale } from '../../hooks/useActivity'
+import Sold from './Sold'
 
 export type MatchedAsset = {
   listingId: string
   tokenId: string
   contractAddress: string
+  sellerAddress: string
   chain: Chain
   name: string
   image: string
@@ -32,12 +36,21 @@ export type MatchedAsset = {
 }
 
 const MatchedAssetListing = memo(
-  ({ asset }: { asset: MatchedAsset }) => {
+  ({
+    asset,
+    pendingTransactions,
+    sale,
+  }: {
+    asset: MatchedAsset
+    pendingTransactions?: PendingTransactionType[]
+    sale?: Sale
+  }) => {
     const [container, setContainer] = useState<HTMLDivElement | null>(null)
     const idCircleBackground = useColorModeValue(
       'blackAlpha.100',
       'blackAlpha.300',
     )
+
     return (
       <HStack
         spacing="2"
@@ -63,15 +76,17 @@ const MatchedAssetListing = memo(
           <Box height={LIST_HEIGHT} width={LIST_WIDTH} />
         )}
         <HStack flex="1 1 auto" spacing="3" position="relative">
-          <ImageZoom>
-            <Image
-              src={asset.image}
-              width="48px"
-              height="48px"
-              borderRadius="md"
-              className="SuperSea__Image"
-            />
-          </ImageZoom>
+          <Box flex="0 0 48px" width="48px" height="48px">
+            <ImageZoom>
+              <Image
+                src={asset.image}
+                width="48px"
+                height="48px"
+                borderRadius="md"
+                className="SuperSea__Image"
+              />
+            </ImageZoom>
+          </Box>
           <Box>
             <InternalLink
               route="asset"
@@ -82,7 +97,17 @@ const MatchedAssetListing = memo(
                 tokenId: asset.tokenId,
               }}
             >
-              <Text my="0" fontSize="sm" fontWeight="500">
+              <Text
+                my="0"
+                fontSize="sm"
+                fontWeight="500"
+                maxWidth="150px"
+                textAlign="left"
+                overflow="hidden"
+                textOverflow="ellipsis"
+                whiteSpace="nowrap"
+                css={{ direction: 'rtl' }}
+              >
                 {asset.name}
               </Text>
             </InternalLink>
@@ -91,10 +116,33 @@ const MatchedAssetListing = memo(
             </Box>
           </Box>
         </HStack>
-        <Flex alignItems="center">
-          <EthereumIcon mx="0.5em" wrapped={asset.currency === 'WETH'} />
-          <Text fontWeight="600">{readableEthValue(+asset.price)}</Text>
-        </Flex>
+        <HStack spacing="4">
+          {sale ? (
+            <Sold sale={sale} />
+          ) : (
+            <PendingTransactions
+              pendingTransactions={pendingTransactions?.filter(
+                ({ addedAt }) => {
+                  return addedAt >= +new Date(asset.timestamp + 'Z') - 5000
+                },
+              )}
+            />
+          )}
+          <Flex
+            alignItems="center"
+            opacity={sale ? 0.5 : 1}
+            minWidth="60px"
+            justifyContent="flex-end"
+          >
+            <EthereumIcon mx="0.5em" wrapped={asset.currency === 'WETH'} />
+            <Text
+              fontWeight="600"
+              textDecoration={sale ? 'line-through' : 'none'}
+            >
+              {readableEthValue(+asset.price)}
+            </Text>
+          </Flex>
+        </HStack>
         <Box pl="4">
           <Circle
             p="2"
@@ -109,7 +157,10 @@ const MatchedAssetListing = memo(
       </HStack>
     )
   },
-  (prev, next) => prev.asset.listingId === next.asset.listingId,
+  (prev, next) =>
+    prev.asset.listingId === next.asset.listingId &&
+    Boolean(prev.sale) === Boolean(next.sale) &&
+    prev.pendingTransactions?.length === next.pendingTransactions?.length,
 )
 
 export default MatchedAssetListing

@@ -97,7 +97,7 @@ const TraitSelect = ({
           options={options as any}
           search
           disabled={isDisabled}
-          closeOnSelect
+          closeOnSelect={false}
           multiple
           printOptions="on-focus"
           value={value}

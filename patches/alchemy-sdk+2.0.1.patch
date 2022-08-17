@@ -1,0 +1,23 @@
+diff --git a/node_modules/alchemy-sdk/dist/esm/index-969f3a91.js b/node_modules/alchemy-sdk/dist/esm/index-969f3a91.js
+index f65cc71..a90d19a 100644
+--- a/node_modules/alchemy-sdk/dist/esm/index-969f3a91.js
++++ b/node_modules/alchemy-sdk/dist/esm/index-969f3a91.js
+@@ -1,5 +1,6 @@
+ import { BigNumber } from '@ethersproject/bignumber';
+ import axios from 'axios';
++import { AlchemyWebSocketProvider } from './alchemy-websocket-provider-dfa03a22.js'
+ 
+ /**
+  * The supported networks by Alchemy. Note that some functions are not available
+@@ -1114,10 +1115,7 @@ class AlchemyConfig {
+      */
+     getWebSocketProvider() {
+         if (!this._baseAlchemyWssProvider) {
+-            this._baseAlchemyWssProvider = (() => __awaiter(this, void 0, void 0, function* () {
+-                const { AlchemyWebSocketProvider } = yield import('./alchemy-websocket-provider-dfa03a22.js');
+-                return new AlchemyWebSocketProvider(this);
+-            }))();
++            this._baseAlchemyWssProvider = new AlchemyWebSocketProvider(this);
+         }
+         return this._baseAlchemyWssProvider;
+     }

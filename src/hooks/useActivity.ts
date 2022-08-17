@@ -12,6 +12,13 @@ export type PollStatus =
   | 'RATE_LIMITED'
   | 'STREAMING'
 export type ActivityFilter = 'ALL' | 'CREATED' | 'SUCCESSFUL' | 'NONE'
+export type Sale = {
+  hash: string | null
+  timestamp: number
+  tokenId: string
+  contractAddress: string
+  chain: string
+}
 
 let seen: Record<string, boolean> = {}
 let consecutiveRateLimits = 0
@@ -45,6 +52,7 @@ const useActivity = ({
     cachedListingEvents,
   )
   const [saleEvents, setSaleEvents] = useState<Event[]>(cachedSaleEvents)
+  const saleRecord = useRef<Record<string, Sale>>({}).current
 
   const [status, setStatus] = useState<PollStatus>(cachedStatus)
   const collectionSlugsKey = collectionSlugs.join(',')
@@ -129,6 +137,8 @@ const useActivity = ({
               image: _.get(edge, paths.image),
               price: _.get(edge, paths.price),
               currency: _.get(edge, paths.currency),
+              sellerAddress: _.get(edge, paths.sellerAddress),
+              blockExplorerLink: _.get(edge, paths.blockExplorerLink),
               timestamp,
               eventType,
             }
@@ -225,8 +235,24 @@ const useActivity = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [collectionSlugsKey, extensionConfig?.useStreamClient])
 
+  events.forEach((event) => {
+    if (event.eventType === 'SUCCESSFUL') {
+      const key = `${event.sellerAddress}:${event.contractAddress}:${event.tokenId}`
+      saleRecord[key] = {
+        chain: event.chain,
+        tokenId: event.tokenId,
+        contractAddress: event.contractAddress,
+        hash: event.blockExplorerLink
+          ? event.blockExplorerLink.split('/').pop() || null
+          : null,
+        timestamp: +new Date(event.timestamp),
+      }
+    }
+  })
+
   return {
     events,
+    saleRecord,
     filteredEvents: (() => {
       if (filter === 'CREATED') return listingEvents
       if (filter === 'SUCCESSFUL') return saleEvents

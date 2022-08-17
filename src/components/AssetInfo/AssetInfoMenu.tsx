@@ -22,6 +22,7 @@ import queryString from 'query-string'
 import LooksRareSvg from '../../assets/looksrare.svg'
 import X2Y2Svg from '../../assets/x2y2.svg'
 import SnipedSvg from '../../assets/sniped.svg'
+import SudoSwapSvg from '../../assets/sudoswap.svg'
 import GemSvg from '../../assets/gemxyz.svg'
 import EtherScanSvg from '../../assets/etherscan.svg'
 import PolygonScanSvg from '../../assets/polygonscan.svg'
@@ -398,6 +399,20 @@ const AssetInfoMenu = ({
                   )}{' '}
                   {chain === 'ethereum' && (
                     <TooltipIconButton
+                      label="x2y2"
+                      icon={<Icon as={X2Y2Svg as any} />}
+                      bg="transparent"
+                      onClick={async () => {
+                        onClose()
+                        window.open(
+                          `https://x2y2.io/eth/${address}/${tokenId}`,
+                          '_blank',
+                        )
+                      }}
+                    />
+                  )}{' '}
+                  {chain === 'ethereum' && (
+                    <TooltipIconButton
                       label="gem.xyz"
                       icon={<Icon as={GemSvg as any} />}
                       bg="transparent"
@@ -412,13 +427,14 @@ const AssetInfoMenu = ({
                   )}{' '}
                   {chain === 'ethereum' && (
                     <TooltipIconButton
-                      label="x2y2"
-                      icon={<Icon as={X2Y2Svg as any} />}
+                      label="sudoswap"
+                      icon={<Icon as={SudoSwapSvg as any} />}
                       bg="transparent"
+                      fontSize="26px"
                       onClick={async () => {
                         onClose()
                         window.open(
-                          `https://x2y2.io/eth/${address}/${tokenId}`,
+                          `https://sudoswap.xyz/#/browse/buy/${address}`,
                           '_blank',
                         )
                       }}

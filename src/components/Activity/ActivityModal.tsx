@@ -42,7 +42,7 @@ import {
   fetchIsRanked,
   fetchRaritiesWithTraits,
 } from '../../utils/api'
-import { ActivityFilter, PollStatus } from '../../hooks/useActivity'
+import { ActivityFilter, PollStatus, Sale } from '../../hooks/useActivity'
 import { BiRefresh } from 'react-icons/bi'
 import ListingNotifierForm, { Notifier } from './ListingNotifierForm'
 import MatchedAssetListing, { MatchedAsset } from './MatchedAssetListing'
@@ -52,6 +52,10 @@ import ListingNotifier from './ListingNotifier'
 import StateRestore from './StateRestore'
 import { StoredActivityState } from '../../utils/extensionConfig'
 import ActivityList from './ActivityList'
+import {
+  getPendingTransactionsForCollection,
+  PendingTransaction,
+} from '../../hooks/usePendingTransactions'
 
 let sessionHideStateRestore = false
 
@@ -132,6 +136,8 @@ const ActivityModal = ({
   onRemoveNotifier,
   onClearMatches,
   activeCollectionSlug,
+  pendingTransactionRecord,
+  saleRecord,
   activityFilter,
   onChangeActivityFilter,
   playSound,
@@ -157,6 +163,8 @@ const ActivityModal = ({
   onRemoveNotifier: (notifier: Notifier) => void
   onClearMatches: () => void
   activeCollectionSlug?: string
+  pendingTransactionRecord: Record<string, PendingTransaction[]>
+  saleRecord: Record<string, Sale>
   activityFilter: ActivityFilter
   onChangeActivityFilter: (filter: ActivityFilter) => void
   playSound: boolean
@@ -261,6 +269,14 @@ const ActivityModal = ({
                       <WatchedCollection
                         collection={collection}
                         key={collection.slug}
+                        pendingTransactions={getPendingTransactionsForCollection(
+                          {
+                            collectionContractAddress:
+                              collection.contractAddress,
+                            pendingTransactionRecord,
+                            saleRecord,
+                          },
+                        )}
                         onRemove={() => {
                           onRemoveCollection(collection)
                         }}
@@ -605,11 +621,25 @@ const ActivityModal = ({
                   </Box>
                 ) : (
                   <ActivityList
-                    items={events}
-                    renderItem={(event) => <ActivityEvent event={event} />}
                     contentKey={`${activityFilter}_${
                       modalProps.isOpen ? 'open' : 'closed'
                     }`}
+                    items={events}
+                    renderItem={(event) => (
+                      <ActivityEvent
+                        event={event}
+                        pendingTransactions={
+                          pendingTransactionRecord[
+                            `${event.contractAddress}:${event.tokenId}`
+                          ]
+                        }
+                        sale={
+                          saleRecord[
+                            `${event.sellerAddress}:${event.contractAddress}:${event.tokenId}`
+                          ]
+                        }
+                      />
+                    )}
                   />
                 )}
               </Box>
@@ -641,11 +671,23 @@ const ActivityModal = ({
                     </Text>
                     {matchedAssets.length ? (
                       <ActivityList
+                        contentKey={modalProps.isOpen ? 'open' : 'closed'}
                         items={matchedAssets}
                         renderItem={(asset) => (
-                          <MatchedAssetListing asset={asset} />
+                          <MatchedAssetListing
+                            asset={asset}
+                            pendingTransactions={
+                              pendingTransactionRecord[
+                                `${asset.contractAddress}:${asset.tokenId}`
+                              ]
+                            }
+                            sale={
+                              saleRecord[
+                                `${asset.sellerAddress}:${asset.contractAddress}:${asset.tokenId}`
+                              ]
+                            }
+                          />
                         )}
-                        contentKey={modalProps.isOpen ? 'open' : 'closed'}
                       />
                     ) : (
                       <Box

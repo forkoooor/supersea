@@ -23,7 +23,7 @@ export const getCheapestListing = (
   const listings = [
     ...(wyvernListings || []).map((listing: any) => ({
       ...listing,
-      protocol: 'wyvern',
+      protocol: 'seaport',
     })),
     ...(seaportListings || []).map((listing: any) => ({
       ...listing,

@@ -179,6 +179,8 @@ export type RemoteConfig = {
         listingId: string
         tokenId: string
         contractAddress: string
+        sellerAddress: string
+        blockExplorerLink: string
         name: string
         collectionName: string
         chain: string
@@ -325,12 +327,13 @@ const nonFungibleRequest = async (
   query: any,
   variables: any = {},
   refreshAccessToken = false,
+  url = GRAPHQL_CDN_URL,
 ): Promise<any> => {
   const user = await getUser(refreshAccessToken)
   const accessToken = user?.role !== 'FREE' && user?.accessToken
   try {
     const res = await request(
-      GRAPHQL_CDN_URL,
+      url,
       query,
       variables,
       accessToken
@@ -819,6 +822,31 @@ export const fetchTokenProperties = async (
 
 export const fetchOptimalGasPreset = async () => {
   return fetch('https://nonfungible.tools/api/gas').then((res) => res.json())
+}
+
+const nodeProviderKeyQuery = gql`
+  query NodeProviderKey {
+    nodeProviderKey
+  }
+`
+
+const nodeProviderKeyLoader = new DataLoader(
+  async () => {
+    const res = await nonFungibleRequest(
+      nodeProviderKeyQuery,
+      {},
+      false,
+      GRAPHQL_AUTH_URL,
+    )
+    return [res.nodeProviderKey]
+  },
+  {
+    maxBatchSize: 1,
+  },
+)
+
+export const fetchAlchemyKey = async (): Promise<string> => {
+  return nodeProviderKeyLoader.load('key')
 }
 
 export const fetchMetadata = async (

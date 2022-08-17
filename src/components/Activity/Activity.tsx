@@ -6,7 +6,7 @@ import {
   useDisclosure,
   useToast,
 } from '@chakra-ui/react'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { BiRefresh } from 'react-icons/bi'
 import useActivity, { ActivityFilter } from '../../hooks/useActivity'
 import useNotifier from '../../hooks/useNotifier'
@@ -26,6 +26,7 @@ import Logo from '../Logo'
 import ActivityModal, { prepareCollection } from './ActivityModal'
 import { Collection } from './WatchedCollection'
 import Toast from '../Toast'
+import usePendingTransactions from '../../hooks/usePendingTransactions'
 
 // Keep state cached so it's not lost when component is unmounted from
 // navigating on OpenSea
@@ -86,6 +87,21 @@ const Activity = () => {
     playSound,
     sendNotification,
     isOpen: modalDisclosure.isOpen,
+  })
+
+  const contractAddressMap = useMemo(() => {
+    const result: Record<string, boolean> = {}
+    activityState.events.forEach(({ contractAddress }) => {
+      result[contractAddress] = true
+    })
+    matchedAssets.forEach(({ contractAddress }) => {
+      result[contractAddress] = true
+    })
+    return result
+  }, [activityState.events, matchedAssets])
+
+  const pendingTransactionRecord = usePendingTransactions({
+    contractAddressMap,
   })
 
   useEffect(() => {
@@ -240,6 +256,8 @@ const Activity = () => {
           isOpen={modalDisclosure.isOpen}
           onClose={modalDisclosure.onClose}
           events={activityState.filteredEvents}
+          pendingTransactionRecord={pendingTransactionRecord}
+          saleRecord={activityState.saleRecord}
           playSound={playSound}
           onChangePlaySound={setPlaySound}
           sendNotification={sendNotification}

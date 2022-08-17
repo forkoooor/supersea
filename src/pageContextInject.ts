@@ -5,7 +5,6 @@ import {
   assetFromJSON,
   deserializeOrder,
 } from 'opensea-js'
-import { OpenSeaPort as OpenSeaSDKWyvern } from 'opensea-js-wyvern'
 import { RateLimit } from 'async-sema'
 import { readableEthValue, weiToEth } from './utils/ethereum'
 ;((window: any) => {
@@ -39,42 +38,7 @@ import { readableEthValue, weiToEth } from './utils/ethereum'
         const openseaSDK = new OpenSeaSDK((window as any).ethereum, {
           networkName: Network.Main,
         })
-        const openseaSDKWyvern = new OpenSeaSDKWyvern(
-          (window as any).ethereum,
-          {
-            networkName: Network.Main,
-          },
-        )
 
-        openseaSDKWyvern.gasIncreaseFactor = 1.3
-
-        if (event.data.params.gasPreset) {
-          if (order.protocol === 'wyvern') {
-            //@ts-ignore
-            const wyvernProtocol = openseaSDKWyvern._getWyvernProtocolForOrder(
-              order,
-            )
-            const _sendTransactionAsync =
-              wyvernProtocol.wyvernExchange.atomicMatch_.sendTransactionAsync
-
-            wyvernProtocol.wyvernExchange.atomicMatch_.sendTransactionAsync = (
-              ...args: any
-            ) => {
-              args[args.length - 1].maxPriorityFeePerGas = (
-                event.data.params.gasPreset.priorityFee *
-                10 ** 9
-              ).toString(16)
-              args[args.length - 1].maxFeePerGas = (
-                event.data.params.gasPreset.fee *
-                10 ** 9
-              ).toString(16)
-              return _sendTransactionAsync.apply(
-                (wyvernProtocol as any).wyvernExchange.atomicMatch_,
-                args,
-              )
-            }
-          }
-        }
         const _fulfillOrder = openseaSDK.seaport.fulfillOrder
         openseaSDK.seaport.fulfillOrder = async (...args: any) => {
           const returnValue = await _fulfillOrder.apply(
@@ -95,7 +59,7 @@ import { readableEthValue, weiToEth } from './utils/ethereum'
               }
               // Set custom gas limit to work around ethers.js estimation issues
               // TODO: May need tweaking
-              args[0].gasLimit = 350000
+              args[0].gasLimit = 351523
               return _transact.apply(action.transactionMethods, args)
             }
           })
@@ -114,17 +78,10 @@ import { readableEthValue, weiToEth } from './utils/ethereum'
           )
         }
 
-        if (order.protocol === 'wyvern') {
-          await openseaSDKWyvern.fulfillOrder({
-            order: orderFromJSON(order) as any,
-            accountAddress: await getEthAccount(),
-          })
-        } else {
-          await openseaSDK.fulfillOrder({
-            order: deserializeOrder(order),
-            accountAddress: await getEthAccount(),
-          })
-        }
+        await openseaSDK.fulfillOrder({
+          order: deserializeOrder(order),
+          accountAddress: await getEthAccount(),
+        })
         window.postMessage({
           method: 'SuperSea__Buy__Success',
           params: { ...event.data.params },

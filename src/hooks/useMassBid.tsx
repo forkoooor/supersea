@@ -185,12 +185,12 @@ const useMassBid = ({
             asset!.asset_contract.address,
             asset!.token_id,
           )
-          highestOffer = [...res.offers, ...res.seaport_offers].reduce(
-            (acc: number, { current_price }) => {
-              return Math.max(acc, weiToEth(Number(current_price)))
-            },
-            0,
-          )
+          highestOffer = [
+            ...(res.offers || []),
+            ...(res.seaport_offers || []),
+          ].reduce((acc: number, { current_price }) => {
+            return Math.max(acc, weiToEth(Number(current_price)))
+          }, 0)
         } catch (e) {}
       }
 

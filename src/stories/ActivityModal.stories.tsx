@@ -5,6 +5,7 @@ import { Center } from '@chakra-ui/react'
 
 import ActivityModal from '../components/Activity/ActivityModal'
 import { Event } from '../components/Activity/ActivityEvent'
+import { gweiToWei } from '../utils/ethereum'
 
 export default {
   title: 'ActivityModal',
@@ -20,10 +21,11 @@ const DEFAULT_EVENTS = [
     name: 'Cool Cat #100',
     image:
       'https://lh3.googleusercontent.com/C7ZN75ly1rxvZ_LpRlfm5Q6GD5lbedmfubhmGHIvUxXawh7-nhXKvl_UIvOjuYrWFPmiYbr4wJn4hA1WRUbYXBiakSFuKLhZth2smvY=w600',
-    price: '10000000000000000000',
+    price: '11111111111110000000',
     currency: 'ETH',
     timestamp: new Date().toISOString().replace('Z', ''),
     eventType: 'CREATED',
+    sellerAddress: '0x00',
   },
   {
     listingId: '2',
@@ -37,6 +39,7 @@ const DEFAULT_EVENTS = [
     currency: 'ETH',
     timestamp: new Date().toISOString().replace('Z', ''),
     eventType: 'CREATED',
+    sellerAddress: '0x00',
   },
   {
     listingId: '3',
@@ -50,8 +53,71 @@ const DEFAULT_EVENTS = [
     currency: 'ETH',
     timestamp: new Date().toISOString().replace('Z', ''),
     eventType: 'SUCCESSFUL',
+    sellerAddress: '0x00',
+  },
+  {
+    listingId: '4',
+    tokenId: '300',
+    contractAddress: '0x1a92f7381b9f03921564a437210bb9396471050c',
+    chain: 'ethereum',
+    name: 'Cool Cat #200',
+    image:
+      'https://lh3.googleusercontent.com/DFn2OdxeVZtbmXpaXBf8m3eobkjrzryaetfr7q3T8KPrg04ssOmfi3zHSSVh8yQ0XruqFq4qRzdc4Dj4uz6cPZb6p77FMVXnYHLWPQ=w600',
+    price: '12500000000000000000',
+    currency: 'ETH',
+    timestamp: new Date().toISOString().replace('Z', ''),
+    eventType: 'CREATED',
+    sellerAddress: '0x00',
   },
 ] as Event[]
+
+const pendingTransactionRecord = {
+  '0x1a92f7381b9f03921564a437210bb9396471050c:100': [
+    {
+      hash: '1',
+      tokenId: '100',
+      fromAddress: '0x123',
+      contractAddress: '0x1a92f7381b9f03921564a437210bb9396471050c',
+      addedAt: Date.now(),
+      isLegacy: false,
+      priorityFee: gweiToWei(2.5),
+      maxPriorityFeePerGas: gweiToWei(2.5),
+      maxFeePerGas: gweiToWei(50),
+    },
+    {
+      hash: '2',
+      tokenId: '100',
+      fromAddress: '0x123',
+      contractAddress: '0x1a92f7381b9f03921564a437210bb9396471050c',
+      addedAt: Date.now(),
+      priorityFee: gweiToWei(15),
+      maxPriorityFeePerGas: null,
+      maxFeePerGas: null,
+      isLegacy: true,
+    },
+    {
+      hash: '3',
+      tokenId: '300',
+      fromAddress: '0x123',
+      contractAddress: '0x1a92f7381b9f03921564a437210bb9396471050c',
+      addedAt: Date.now(),
+      priorityFee: gweiToWei(15),
+      maxPriorityFeePerGas: null,
+      maxFeePerGas: null,
+      isLegacy: true,
+    },
+  ],
+}
+
+const saleRecord = {
+  '0x00:0x1a92f7381b9f03921564a437210bb9396471050:300': {
+    tokenId: '300',
+    contractAddress: '0x1a92f7381b9f03921564a437210bb9396471050c',
+    chain: 'ethereum',
+    timestamp: Date.now() + 1000,
+    hash: '0xa86e72b4888501561b58f67fbafa167dd25f779888a1cc1113f92c06018a12b8',
+  },
+}
 
 let key = 1000
 const Template: Story<
@@ -86,6 +152,8 @@ export const Default = Template.bind({})
 Default.args = {
   isOpen: true,
   events: DEFAULT_EVENTS,
+  pendingTransactionRecord,
+  saleRecord,
   matchedAssets: [
     {
       listingId: '1',
@@ -95,9 +163,10 @@ Default.args = {
       name: 'Cool Cat #100',
       image:
         'https://lh3.googleusercontent.com/C7ZN75ly1rxvZ_LpRlfm5Q6GD5lbedmfubhmGHIvUxXawh7-nhXKvl_UIvOjuYrWFPmiYbr4wJn4hA1WRUbYXBiakSFuKLhZth2smvY=w600',
-      price: '10000000000000000000',
+      price: '1000000000000000000',
       currency: 'ETH',
       timestamp: new Date().toISOString().replace('Z', ''),
+      sellerAddress: '0x00',
       notifier: {
         id: '1',
         gasOverride: null,
@@ -137,6 +206,7 @@ Default.args = {
     },
   ],
   activeCollectionSlug: 'wonderpals',
+
   notifiers: [
     {
       id: '1',
