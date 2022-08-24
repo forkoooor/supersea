@@ -3,6 +3,7 @@ import { request, gql, GraphQLClient } from 'graphql-request'
 import { fetchMetadataUri } from '../utils/web3'
 import { RateLimit, Sema } from 'async-sema'
 import { User } from './user'
+import _ from 'lodash'
 import lastKnownRemoteConfig from '../assets/lastKnownRemoteConfig.json'
 import { Selectors } from './selector'
 
@@ -879,7 +880,7 @@ export const fetchOpenSeaGraphQL = async <
   return fetch('https://api.opensea.io/graphql/', {
     method: 'POST',
     headers: {
-      ...remoteConfig.queryHeaders,
+      ..._.omit(remoteConfig.queryHeaders, 'x-api-key'),
       ...remoteConfig.queries[query].staticHeaders,
       ...(sessionKey ? { authorization: `JWT ${sessionKey}` } : {}),
     },

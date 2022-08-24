@@ -1,11 +1,9 @@
-import { Alchemy } from 'alchemy-sdk'
 import _ from 'lodash'
-import { useEffect, useState } from 'react'
-import { fetchAlchemyKey } from '../utils/api'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { getUser } from '../utils/api'
 import { useUser } from '../utils/user'
 import { Sale } from './useActivity'
-
-const CONTRACT_ADDRESS = '0x00000000006c3852cbef3e08e8df289169ede581'
+import { io, Socket } from 'socket.io-client'
 
 export type PendingTransaction = {
   hash: string
@@ -43,10 +41,18 @@ export const getPendingTransactionsForCollection = ({
 
 const usePendingTransactions = ({
   contractAddressMap,
+  active,
 }: {
   contractAddressMap: Record<string, boolean>
+  active: boolean
 }) => {
-  const [alchemyClient, setAlchemyClient] = useState<Alchemy | null>(null)
+  const visbilityTimeout = useRef<NodeJS.Timeout | null>(null)
+  const [isIdle, setIsIdle] = useState(false)
+  const debouncedSetIdle = useMemo(
+    () => _.debounce(() => setIsIdle(true), 5 * 60 * 1000),
+    [setIsIdle],
+  )
+  const [socketClient, setSocketClient] = useState<Socket | null>(null)
   const [hasInitialized, setHasInitialized] = useState(false)
   const user = useUser()
   const [pendingTransactions, setPendingTransactions] = useState<
@@ -56,82 +62,99 @@ const usePendingTransactions = ({
   const contractAddressesKey = Object.keys(contractAddressMap).sort().join(',')
 
   useEffect(() => {
+    const mouseListener = () => {
+      debouncedSetIdle()
+      if (isIdle) {
+        setIsIdle(false)
+      }
+    }
+    const visibilityListener = () => {
+      if (visbilityTimeout.current !== null) {
+        clearTimeout(visbilityTimeout.current)
+      }
+      if (document.visibilityState === 'hidden') {
+        visbilityTimeout.current = setTimeout(() => {
+          setIsIdle(true)
+        }, 10 * 1000)
+      } else {
+        debouncedSetIdle()
+        if (isIdle) {
+          setIsIdle(false)
+        }
+      }
+    }
+    document.addEventListener('visibilitychange', visibilityListener)
+    document.addEventListener('mousemove', mouseListener)
+    return () => {
+      document.removeEventListener('visibilitychange', visibilityListener)
+      document.removeEventListener('mousemove', mouseListener)
+    }
+  }, [isIdle, debouncedSetIdle])
+
+  useEffect(() => {
+    return () => {}
+  }, [isIdle, debouncedSetIdle])
+
+  const shouldSubscribe = active && !isIdle
+
+  useEffect(() => {
     if (
       contractAddressesKey &&
-      !alchemyClient &&
+      !socketClient &&
       !hasInitialized &&
       user?.isSubscriber
     ) {
       ;(async () => {
         setHasInitialized(true)
-        const apiKey = await fetchAlchemyKey()
-        if (apiKey) {
-          setAlchemyClient(new Alchemy({ apiKey }))
+        const user = await getUser()
+        if (user?.accessToken) {
+          const socket = io('https://pending.nonfungible.tools', {
+            auth: {
+              token: user.accessToken,
+            },
+          })
+          socket.once('connect', () => {
+            setSocketClient(socket)
+          })
         }
       })()
     }
-  }, [alchemyClient, hasInitialized, contractAddressesKey, user])
+  }, [socketClient, hasInitialized, contractAddressesKey, user])
 
   useEffect(() => {
-    if (!alchemyClient) return
-    alchemyClient.ws.removeAllListeners()
-    if (contractAddressesKey) {
-      alchemyClient.ws.on(
-        {
-          method: 'alchemy_pendingTransactions',
-          toAddress: CONTRACT_ADDRESS,
-        },
-        ({
-          hash,
-          input,
-          from,
-          gasPrice: _gasPrice,
-          maxFeePerGas: _maxFeePerGas,
-          maxPriorityFeePerGas: _maxPriorityFeePerGas,
-        }) => {
-          if (!input.startsWith('0xfb0f3ee1')) return
-          const split = input.slice(10).match(/.{1,64}/g) as string[]
-          const [_contractAddress, _tokenId] = split.slice(6)
-          const contractAddress = `0x${_contractAddress.slice(-40)}`
-          const tokenId = String(parseInt(_tokenId, 16))
+    if (!socketClient) return
+    socketClient.off('pendingTransaction')
+    if (!shouldSubscribe && socketClient.connected) {
+      socketClient.disconnect()
+      return
+    }
+    if (shouldSubscribe && socketClient.disconnected) {
+      socketClient.connect()
+    }
+    if (contractAddressesKey && shouldSubscribe) {
+      socketClient.on('pendingTransaction', (pendingTransaction) => {
+        if (!contractAddressMap[pendingTransaction.contractAddress]) return
 
-          if (!contractAddressMap[contractAddress]) return
-
-          const gasPrice = parseInt(_gasPrice, 16)
-          const maxFeePerGas = parseInt(_maxFeePerGas, 16)
-          const maxPriorityFeePerGas = parseInt(_maxPriorityFeePerGas, 16)
-          const priorityFee = maxPriorityFeePerGas
-            ? Math.min(maxFeePerGas, maxPriorityFeePerGas)
-            : gasPrice
-
-          setPendingTransactions((list) => {
-            return list
-              .concat([
-                {
-                  hash,
-                  fromAddress: from,
-                  priorityFee,
-                  maxFeePerGas,
-                  maxPriorityFeePerGas,
-                  isLegacy: !maxPriorityFeePerGas,
-                  contractAddress,
-                  tokenId,
-                  addedAt: Date.now(),
-                },
-              ])
-              .filter(({ addedAt }) => {
-                return Date.now() - addedAt < 1000 * 60
-              })
-          })
-        },
-      )
+        setPendingTransactions((list) => {
+          return list
+            .concat([
+              {
+                ...pendingTransaction,
+                addedAt: Date.now(),
+              },
+            ])
+            .filter(({ addedAt }) => {
+              return Date.now() - addedAt < 1000 * 60
+            })
+        })
+      })
     }
 
     return () => {
-      alchemyClient.ws.removeAllListeners()
+      socketClient.off('pendingTransaction')
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [alchemyClient, contractAddressesKey])
+  }, [shouldSubscribe, socketClient, contractAddressesKey])
 
   return _.groupBy(pendingTransactions, ({ contractAddress, tokenId }) => {
     return `${contractAddress}:${tokenId}`
