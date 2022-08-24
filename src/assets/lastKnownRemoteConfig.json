@@ -223,7 +223,7 @@
     },
     "profileSummary": {
       "node": {
-        "selector": "body:not([data-supersea-path^=\"/collection/\"]):not([data-supersea-path=\"\"]):not([data-supersea-path^=\"/rankings\"]) ul.sc-151637b-1",
+        "selector": "body:not([data-supersea-path^=\"/collection/\"]):not([data-supersea-path=\"\"]):not([data-supersea-path^=\"/rankings\"]) *[data-testid=\"ProfilePage--navbar\"]",
         "injectionMethod": "insertBefore"
       }
     },
