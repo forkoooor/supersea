@@ -106,7 +106,7 @@ import { readableEthValue, weiToEth } from './utils/ethereum'
         await bidRateLimit()
         const openseaSDK = new OpenSeaSDK((window as any).ethereum, {
           networkName: Network.Main,
-          apiKey: '2f6f419a083c46de9d83ce3dbe7db601',
+          apiKey: event.data.params.apiKey,
         })
 
         const postOrder = openseaSDK.api.postOrder

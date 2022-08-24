@@ -1,7 +1,7 @@
 import { useToast } from '@chakra-ui/toast'
 import { useEffect, useRef, useState } from 'react'
 import Toast from '../components/Toast'
-import { Asset, fetchOffers } from '../utils/api'
+import { Asset, fetchOffers, fetchRemoteConfig } from '../utils/api'
 import { MassBidState } from '../components/SearchResults/MassBidStatus'
 import { weiToEth } from '../utils/ethereum'
 
@@ -193,13 +193,14 @@ const useMassBid = ({
           }, 0)
         } catch (e) {}
       }
-
+      const config = await fetchRemoteConfig()
       window.addEventListener('message', messageListener)
       window.postMessage({
         method: 'SuperSea__Bid',
         params: {
           asset,
           highestOffer,
+          apiKey: config.queryHeaders['x-api-key'],
           tokenId: asset?.token_id,
           address: asset?.asset_contract.address,
           price: massBid.price,

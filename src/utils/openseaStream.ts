@@ -6,12 +6,10 @@ import {
   // @ts-ignore
 } from '@opensea/stream-js'
 import { Event } from '../components/Activity/ActivityEvent'
-import { Chain } from './api'
+import { Chain, fetchRemoteConfig } from './api'
 
 class OpenSeaStream extends EventTarget {
-  client: OpenSeaStreamClient = new OpenSeaStreamClient({
-    token: '2f6f419a083c46de9d83ce3dbe7db601',
-  })
+  client: OpenSeaStreamClient | null = null
   events: Event[] = []
   saleEvents: Event[] = []
   listingEvents: Event[] = []
@@ -54,7 +52,13 @@ class OpenSeaStream extends EventTarget {
     )
   }
 
-  subscribe(collectionSlug: string) {
+  async subscribe(collectionSlug: string) {
+    if (!this.client) {
+      const config = await fetchRemoteConfig()
+      this.client = new OpenSeaStreamClient({
+        token: config.queryHeaders['x-api-key'],
+      })
+    }
     this.activeStreams[collectionSlug] = this.client.onEvents(
       collectionSlug,
       [EventType.ITEM_LISTED, EventType.ITEM_SOLD],
