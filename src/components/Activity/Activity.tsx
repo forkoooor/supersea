@@ -102,6 +102,7 @@ const Activity = () => {
 
   const pendingTransactionRecord = usePendingTransactions({
     contractAddressMap,
+    active: watchedCollections.length > 0,
   })
 
   useEffect(() => {
