@@ -50,6 +50,7 @@
   "scripts": {
     "start": "craco start",
     "build": "craco build && yarn clean-build-extension-scripts",
+    "package": "./create-package.sh",
     "clean-build-extension-scripts": "parcel build src/content.tsx src/background.ts src/pageContextInject.ts --dist-dir build/static/js --no-cache",
     "build-extension-scripts": "parcel build src/content.tsx src/background.ts src/pageContextInject.ts --dist-dir build/static/js",
     "test": "craco test",
