@@ -17,6 +17,36 @@ export type PendingTransaction = {
   addedAt: number
 }
 
+const connectSocket = async (socket: Socket, refreshAccessToken = false) => {
+  const user = await getUser(refreshAccessToken)
+  if (!user || user.role === 'FREE' || !user.accessToken) return false
+  socket.auth = {
+    token: user.accessToken,
+  }
+
+  return new Promise((resolve) => {
+    const onConnect = () => {
+      socket.off('connect', onConnect)
+      socket.off('connect_error', onConnectError)
+      resolve(true)
+    }
+
+    const onConnectError = async () => {
+      socket.off('connect', onConnect)
+      socket.off('connect_error', onConnectError)
+      if (refreshAccessToken) {
+        resolve(false)
+      } else {
+        resolve(await connectSocket(socket, true))
+      }
+    }
+
+    socket.on('connect', onConnect)
+    socket.on('connect_error', onConnectError)
+    socket.connect()
+  })
+}
+
 export const getPendingTransactionsForCollection = ({
   collectionContractAddress,
   pendingTransactionRecord,
@@ -106,16 +136,13 @@ const usePendingTransactions = ({
     ) {
       ;(async () => {
         setHasInitialized(true)
-        const user = await getUser()
-        if (user?.accessToken) {
-          const socket = io('https://pending.nonfungible.tools', {
-            auth: {
-              token: user.accessToken,
-            },
-          })
-          socket.once('connect', () => {
-            setSocketClient(socket)
-          })
+
+        const socket = io('https://pending.nonfungible.tools', {
+          autoConnect: false,
+        })
+        const success = await connectSocket(socket)
+        if (success) {
+          setSocketClient(socket)
         }
       })()
     }
@@ -129,7 +156,9 @@ const usePendingTransactions = ({
       return
     }
     if (shouldSubscribe && socketClient.disconnected) {
-      socketClient.connect()
+      connectSocket(socketClient).then((success) => {
+        if (!success) setSocketClient(null)
+      })
     }
     if (contractAddressesKey && shouldSubscribe) {
       socketClient.on('pendingTransaction', (pendingTransaction) => {
