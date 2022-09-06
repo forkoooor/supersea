@@ -1,0 +1,23 @@
+.mason div[show-rarity],
+.nft-card {
+  padding-bottom: 85px;
+  position: relative;
+}
+
+.nft-card .absolute.bottom-20 {
+  bottom: calc(5rem + 85px);
+}
+
+.SuperSea__AssetInfo--grid {
+  width: 100%;
+  height: 0;
+}
+
+.SuperSea__AssetInfo--item {
+  width: 100%;
+}
+
+.SuperSea__AssetInfoCard {
+  border-bottom-left-radius: 0.75rem !important;
+  border-bottom-right-radius: 0.75rem !important;
+}

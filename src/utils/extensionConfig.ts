@@ -2,7 +2,11 @@ import { useEffect, useState } from 'react'
 import { Notifier } from '../components/Activity/ListingNotifierForm'
 
 export type ExtensionConfig = {
-  enabled: boolean
+  enabled: {
+    opensea: boolean
+    sudoswap: boolean
+    gem: boolean
+  }
   quickBuyEnabled: boolean
   notificationSounds: boolean
   quickBuyGasPreset: 'none' | 'fixed' | 'optimal'
@@ -18,7 +22,11 @@ export type StoredActivityState = {
 }
 
 const DEFAULTS: ExtensionConfig = {
-  enabled: true,
+  enabled: {
+    opensea: true,
+    sudoswap: true,
+    gem: true,
+  },
   quickBuyEnabled: false,
   notificationSounds: true,
   quickBuyGasPreset: 'none',
@@ -33,7 +41,16 @@ export const getExtensionConfig = async (
   if (!configPromise || !cached) {
     configPromise = new Promise((resolve) => {
       if (process.env.NODE_ENV === 'production') {
-        chrome.storage.local.get(['extensionConfig'], resolve)
+        chrome.storage.local.get(['extensionConfig'], ({ extensionConfig }) => {
+          if (typeof extensionConfig?.enabled === 'boolean') {
+            extensionConfig.enabled = {
+              opensea: extensionConfig.enabled,
+              sudoswap: extensionConfig.enabled,
+              gem: extensionConfig.enabled,
+            }
+          }
+          resolve({ extensionConfig })
+        })
       } else {
         setTimeout(() => resolve({}), 250)
       }

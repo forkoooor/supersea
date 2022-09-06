@@ -6,53 +6,6 @@ const GRAPHQL_AUTH_URL =
   // @ts-ignore
   chrome.runtime.GRAPHQL_AUTH_URL || 'https://api.nonfungible.tools/graphql'
 
-const pendingOpenSeaRequestBodies: Record<string, string> = {}
-chrome.webRequest.onBeforeSendHeaders.addListener(
-  ({ requestId, requestHeaders, url }) => {
-    const body = pendingOpenSeaRequestBodies[requestId]
-    if (body) {
-      delete pendingOpenSeaRequestBodies[requestId]
-      const bodyData = JSON.parse(body)
-      if (bodyData.id) {
-        chrome.storage.local.get(
-          ['openSeaGraphQlRequests'],
-          ({ openSeaGraphQlRequests }) => {
-            // TODO: Handle quota exceeded?
-            chrome.storage.local.set({
-              openSeaGraphQlRequests: {
-                ...openSeaGraphQlRequests,
-                [bodyData.id]: {
-                  url,
-                  body,
-                  headers: requestHeaders,
-                },
-              },
-            })
-          },
-        )
-      }
-    }
-  },
-  { urls: ['https://api.opensea.io/*'] },
-  ['requestHeaders'],
-)
-chrome.webRequest.onBeforeRequest.addListener(
-  ({ tabId, url, requestId, requestBody }) => {
-    if (
-      typeof tabId === 'number' &&
-      /graphql\/$/.test(url) &&
-      requestBody?.raw?.length
-    ) {
-      const decoder = new TextDecoder('utf-8')
-      pendingOpenSeaRequestBodies[requestId] = decoder.decode(
-        requestBody.raw[0].bytes,
-      )
-    }
-  },
-  { urls: ['https://api.opensea.io/*'] },
-  ['requestBody'],
-)
-
 const refreshTokenMutation = gql`
   mutation RefreshToken {
     refreshToken {

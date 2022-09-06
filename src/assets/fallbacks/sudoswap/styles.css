@@ -1,0 +1,30 @@
+.SuperSea__SudonautRoyalties {
+  flex-grow: 1;
+}
+
+app-manage .nftHolder {
+  height: 17rem !important;
+}
+
+app-manage .nftHolder > div {
+  width: 50% !important;
+  flex: 0 0 50% !important;
+  max-width: 50% !important;
+}
+
+.nftCard {
+  min-width: 11rem !important;
+  position: relative !important;
+  padding-bottom: 95px !important;
+}
+
+.SuperSea__AssetInfoCard {
+  left: 0;
+  border-bottom-left-radius: 8px !important;
+  border-bottom-right-radius: 8px !important;
+}
+
+app-item .bg-secondary > img {
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}

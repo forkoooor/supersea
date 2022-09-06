@@ -27,7 +27,7 @@ import {
   AlertTitle,
 } from '@chakra-ui/react'
 import ScopedCSSPortal from '../ScopedCSSPortal'
-import { fetchTokenProperties } from '../../utils/api'
+import { fetchTokenProperties, Marketplace } from '../../utils/api'
 import {
   determineRarityType,
   RarityTier,
@@ -50,11 +50,13 @@ const PropertiesModal = ({
   collectionSlug,
   address,
   tokenId,
+  marketplace,
 }: {
   onClose: () => void
   collectionSlug?: string
   address: string
   tokenId: string
+  marketplace: Marketplace
 }) => {
   const [propertyBreakdown, setPropertyBreakdown] = useState<
     | {
@@ -81,6 +83,7 @@ const PropertiesModal = ({
     storedExcludeTraitCount || false,
   )
   const tableStripeColor = useColorModeValue('blackAlpha.100', 'whiteAlpha.100')
+  const textColor = useColorModeValue('black', 'white')
   const { colorMode } = useColorMode()
 
   const rankTierDisparity = propertyBreakdown
@@ -321,8 +324,16 @@ const PropertiesModal = ({
                                     route="traitFloor"
                                     params={{
                                       collectionSlug,
+                                      contractAddress: address,
                                       name,
-                                      value,
+                                      value:
+                                        marketplace === 'gem'
+                                          ? value.toLowerCase()
+                                          : value,
+                                    }}
+                                    color={textColor}
+                                    _hover={{
+                                      color: textColor,
                                     }}
                                     onClick={onClose}
                                   >

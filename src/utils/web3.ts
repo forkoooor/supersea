@@ -26,6 +26,43 @@ export const fetchMetadataUri = async (address: string, tokenId: number) => {
   return contract.methods.tokenURI(tokenId).call()
 }
 
+const sudoswapPoolNftContractAddressLoader = new DataLoader(
+  async ([poolAddress]: readonly string[]) => {
+    await rateLimit()
+    try {
+      const poolContract = new web3.eth.Contract(
+        [
+          {
+            inputs: [],
+            name: 'nft',
+            outputs: [
+              {
+                internalType: 'contract IERC721',
+                name: '_nft',
+                type: 'address',
+              },
+            ],
+            stateMutability: 'pure',
+            type: 'function',
+          },
+        ],
+        poolAddress,
+      )
+      const address = await poolContract.methods.nft().call()
+      return [address]
+    } catch (e) {
+      return [null]
+    }
+  },
+  {
+    maxBatchSize: 1,
+  },
+)
+
+export const fetchSudoswapPoolNftContractAddress = (poolAddress: string) => {
+  return sudoswapPoolNftContractAddressLoader.load(poolAddress)
+}
+
 const transactionLoader = new DataLoader(
   async ([transactionHash]: readonly string[]) => {
     await rateLimit()
@@ -41,6 +78,7 @@ const transactionLoader = new DataLoader(
     maxBatchSize: 1,
   },
 )
+
 export const fetchTransaction = (hash: string) => {
   return transactionLoader.load(hash)
 }

@@ -120,12 +120,14 @@ const RarityBadge = ({
               }
               return text ? (
                 <Text
+                  as="div"
                   bg={warningTextBg}
                   color={warningTextColor}
                   fontSize="xs"
                   py="1"
                   px="2"
                   mb="0"
+                  mt="2"
                   borderRadius="sm"
                 >
                   {text}

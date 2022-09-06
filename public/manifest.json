@@ -12,8 +12,18 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://opensea.io/*"],
-      "js": ["static/js/content.js"],
+      "matches": ["https://*.opensea.io/*"],
+      "js": ["static/js/content/opensea.js"],
+      "run_at": "document_end"
+    },
+    {
+      "matches": ["https://*.sudoswap.xyz/*"],
+      "js": ["static/js/content/sudoswap.js"],
+      "run_at": "document_end"
+    },
+    {
+      "matches": ["https://*.gem.xyz/*"],
+      "js": ["static/js/content/gem.js"],
       "run_at": "document_end"
     }
   ],
@@ -22,6 +32,8 @@
   },
   "host_permissions": [
     "https://*.opensea.io/*",
+    "https://*.sudoswap.xyz/*",
+    "https://*.gem.xyz/*",
     "https://*.nonfungible.tools/*"
   ],
   "icons": {

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   Box,
   Text,
@@ -21,11 +21,7 @@ import { ReactComponent as EtherscanSvg } from '../../assets/etherscan.svg'
 import { ReactComponent as LogoSvg } from '../../assets/logo-with-text.svg'
 import QuickBuySettings from './QuickBuySettings'
 import GlobalToggle from './GlobalToggle'
-import {
-  getExtensionConfig,
-  saveExtensionConfig,
-  useExtensionConfig,
-} from '../../utils/extensionConfig'
+import { useExtensionConfig } from '../../utils/extensionConfig'
 import { useUser } from '../../utils/user'
 import StreamingToggle from './StreamingToggle'
 
@@ -115,7 +111,7 @@ const Popup = () => {
             ? [
                 <GlobalToggle
                   key="globalToggle"
-                  isChecked={extensionConfig.enabled}
+                  enabled={extensionConfig.enabled}
                   onChange={(enabled) => {
                     setIsChanged(true)
                     setExtensionConfig({
@@ -138,7 +134,7 @@ const Popup = () => {
                 <QuickBuySettings
                   key="quickBuySettings"
                   user={user}
-                  isDisabled={!extensionConfig.enabled}
+                  isDisabled={false}
                   isChecked={extensionConfig.quickBuyEnabled}
                   switchRef={quickBuyToggleRef}
                   gasPreset={extensionConfig.quickBuyGasPreset}

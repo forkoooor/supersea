@@ -67,6 +67,7 @@ const MatchedAssetListing = memo(
             address={asset.contractAddress!}
             tokenId={asset.tokenId}
             type="list"
+            marketplace="opensea"
             chain={asset.chain}
             container={container}
             quickBuyGasOverride={asset.notifier.gasOverride}

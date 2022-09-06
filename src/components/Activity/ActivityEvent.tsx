@@ -56,6 +56,7 @@ const ActivityEvent = memo(
             address={event.contractAddress!}
             tokenId={event.tokenId}
             type="list"
+            marketplace="opensea"
             chain={event.chain}
             container={container}
             isActivityEvent

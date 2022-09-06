@@ -151,9 +151,12 @@ const ScopedCSSReset = () => (
       h6,
       hr,
       figure,
-      p,
       pre {
         margin: 0;
+      }
+      p[class^=chakra] {
+        margin-top: 0;
+        margin-bottom: 0;
       }
       button {
         background: transparent;

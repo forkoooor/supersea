@@ -1,6 +1,6 @@
 export type HierarchySelector = {
   selector: string
-  hierarchy: 'child' | 'parent' | 'either' | 'outside'
+  hierarchy: 'child' | 'parent' | 'sibling' | 'either' | 'outside'
 }
 
 export type InjectionSelector = {
@@ -81,7 +81,10 @@ export const selectElement = (
     return container.closest(selector)
   } else if (hierarchy === 'outside') {
     return document.querySelector(selector)
+  } else if (hierarchy === 'sibling') {
+    return container.parentNode?.querySelector(selector)
   }
+
   return container.querySelector(selector) || container.closest(selector)
 }
 

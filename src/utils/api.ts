@@ -4,15 +4,36 @@ import { fetchMetadataUri } from '../utils/web3'
 import { RateLimit, Sema } from 'async-sema'
 import { User } from './user'
 import _ from 'lodash'
-import lastKnownRemoteConfig from '../assets/lastKnownRemoteConfig.json'
-import { Selectors } from './selector'
+import { RemoteConfigs } from '../hooks/useRemoteConfig'
+
+const fallbacks: Record<Marketplace, { config: any; styles: string }> = {
+  opensea: {
+    config: require('../assets/fallbacks/opensea/config.json'),
+    styles: '',
+  },
+  sudoswap: {
+    config: require('../assets/fallbacks/sudoswap/config.json'),
+    styles: '',
+  },
+  gem: {
+    config: require('../assets/fallbacks/gem/config.json'),
+    styles: '',
+  },
+}
 
 // Parcel will inline the string
-let lastKnownStyleOverrides = ''
 try {
   const fs = require('fs')
-  lastKnownStyleOverrides = fs.readFileSync(
-    './src/assets/lastKnownStyleOverrides.css',
+  fallbacks.opensea.styles = fs.readFileSync(
+    './src/assets/fallbacks/opensea/styles.css',
+    'utf-8',
+  )
+  fallbacks.sudoswap.styles = fs.readFileSync(
+    './src/assets/fallbacks/sudoswap/styles.css',
+    'utf-8',
+  )
+  fallbacks.gem.styles = fs.readFileSync(
+    './src/assets/fallbacks/gem/styles.css',
     'utf-8',
   )
 } catch (err) {}
@@ -27,6 +48,8 @@ const OPENSEA_SHARED_CONTRACT_COLLECTION_ID_LENGTH = 60
 const ART_BLOCKS_ADDRESS = '0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270'
 
 const ART_BLOCKS_TOKEN_ID_LENGTH = 6
+
+export type Marketplace = 'opensea' | 'sudoswap' | 'gem'
 
 export type Rarities = {
   tokenCount: number
@@ -144,124 +167,46 @@ export const OPENSEA_ASSETS_BATCH_SIZE = 30
 
 const openSeaPublicRateLimit = RateLimit(2)
 
-export type RouteConfig = { url: string; as: string }
-export type RemoteConfig = {
-  nextSsrProps: {
-    scriptSelector: string
-    paths: {
-      profileUsername: string
-      profileAddress: string
-      profileImageUrl: string
-    }
-  }
-  routes: {
-    profile: RouteConfig
-    searchResults: RouteConfig
-    asset: RouteConfig
-    collectionFloor: RouteConfig
-    traitFloor: RouteConfig
-    collection: RouteConfig
-  }
-  injectionSelectors: Selectors
-  queryHeaders: Record<string, string>
-  queries: {
-    EventHistoryPollQuery: {
-      body: string
-      staticHeaders: Record<string, string>
-      staticVariables: Record<string, any>
-      dynamicVariablePaths: {
-        collectionSlugs: string
-        timestamp: string
-        count: string
-      }
-      resultPaths: {
-        edges: string
-        asset: string
-        listingId: string
-        tokenId: string
-        contractAddress: string
-        sellerAddress: string
-        blockExplorerLink: string
-        name: string
-        collectionName: string
-        chain: string
-        image: string
-        price: string
-        currency: string
-        timestamp: string
-        eventType: string
-      }
-    }
-    EventHistoryQuery: {
-      body: string
-      staticHeaders: Record<string, string>
-      staticVariables: Record<string, any>
-      dynamicVariablePaths: {
-        collectionSlugs: string
-        count: string
-      }
-      resultPaths: {
-        edges: string
-        asset: string
-        listingId: string
-        tokenId: string
-        contractAddress: string
-        name: string
-        collectionName: string
-        chain: string
-        image: string
-        price: string
-        currency: string
-        timestamp: string
-        eventType: string
-      }
-    }
-    AssetSelectionSetPrivacyMutation: {
-      body: string
-      staticHeaders: Record<string, string>
-      staticVariables: Record<string, any>
-      dynamicVariablePaths: {
-        assets: string
-        isPrivate: string
-      }
-      resultPaths: {
-        success: string
-      }
-    }
-  }
-}
+let remoteConfigPromise: null | Promise<RemoteConfigs[Marketplace]> = null
 
-let remoteConfigPromise: null | Promise<RemoteConfig> = null
-export const fetchRemoteConfig = () => {
+export const fetchRemoteConfig = <T extends Marketplace = 'opensea'>(
+  marketplace: T = 'opensea' as T,
+): Promise<RemoteConfigs[T]> => {
   if (!remoteConfigPromise) {
     // Fallback to last known selectors if request takes more than 5 seconds
-    remoteConfigPromise = Promise.race<Promise<RemoteConfig>>([
-      fetch(`${REMOTE_ASSET_BASE}/config.json`).then((res) => res.json()),
-      new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('timeout')), 5000)
-      }),
-    ]).catch((err) => {
-      console.error(err)
-      return lastKnownRemoteConfig as RemoteConfig
-    })
-  }
-  return remoteConfigPromise
-}
-
-let cssPromise: null | Promise<string> = null
-export const fetchGlobalCSS = () => {
-  if (!cssPromise) {
-    // Fallback to last known css if request takes more than 5 seconds
-    cssPromise = Promise.race<Promise<string>>([
-      fetch(`${REMOTE_ASSET_BASE}/styleOverrides.css`).then((res) =>
-        res.text(),
+    remoteConfigPromise = Promise.race<Promise<RemoteConfigs[Marketplace]>>([
+      fetch(`${REMOTE_ASSET_BASE}/${marketplace}/config.json`).then((res) =>
+        res.json(),
       ),
       new Promise((_, reject) => {
         setTimeout(() => reject(new Error('timeout')), 5000)
       }),
     ]).catch((err) => {
       console.error(err)
-      return lastKnownStyleOverrides
+      return fallbacks[marketplace].config as RemoteConfigs[T]
+    })
+  }
+
+  return remoteConfigPromise as Promise<RemoteConfigs[T]>
+}
+
+let cssPromise: null | Promise<string> = null
+export const fetchGlobalCSS = (
+  marketplace: keyof typeof fallbacks = 'opensea',
+) => {
+  if (!cssPromise) {
+    // Fallback to last known css if request takes more than 5 seconds
+    cssPromise = Promise.race<Promise<string>>([
+      fetch(`${REMOTE_ASSET_BASE}/${marketplace}/styles.css`).then((res) => {
+        if (res.status !== 200) throw new Error('failed to fetch styles')
+        return res.text()
+      }),
+      new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('timeout')), 5000)
+      }),
+    ]).catch((err) => {
+      console.error(err)
+      return fallbacks[marketplace].styles
     })
   }
   return cssPromise
@@ -860,7 +805,7 @@ export const fetchMetadata = async (
 }
 
 export const fetchOpenSeaGraphQL = async <
-  T extends keyof RemoteConfig['queries']
+  T extends keyof RemoteConfigs['opensea']['queries']
 >(
   query: T,
   {
@@ -869,7 +814,7 @@ export const fetchOpenSeaGraphQL = async <
     cacheBust = true,
   }: {
     variables: Record<
-      keyof RemoteConfig['queries'][T]['dynamicVariablePaths'],
+      keyof RemoteConfigs['opensea']['queries'][T]['dynamicVariablePaths'],
       any
     >
     sessionKey?: string

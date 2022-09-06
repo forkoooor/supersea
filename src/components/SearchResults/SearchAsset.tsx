@@ -189,6 +189,7 @@ const SearchAsset = ({
           tokenId={tokenId}
           type="grid"
           chain="ethereum"
+          marketplace="opensea"
           container={containerRef.current!}
         />
       ) : null}

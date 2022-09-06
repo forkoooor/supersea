@@ -1,0 +1,58 @@
+{
+  "injectionSelectors": {
+    "assetInfo": {
+      "grid": {
+        "node": {
+          "selector": ":where(app-browse, app-manage, app-pool) app-nft-listing-card .nftCard",
+          "injectionMethod": "append"
+        },
+        "id": {
+          "selector": ".idText",
+          "hierarchy": "child"
+        },
+        "poolLink": {
+          "selector": "a[href^=\"#/manage/\"]",
+          "hierarchy": "parent"
+        },
+        "collectionLink": {
+          "selector": "a[href^=\"#/browse/\"]",
+          "hierarchy": "outside"
+        },
+        "image": {
+          "selector": ".nftCardImage",
+          "hierarchy": "child"
+        }
+      },
+      "item": {
+        "node": {
+          "selector": "app-item .bg-secondary > img",
+          "injectionMethod": "insertAfter"
+        },
+        "image": {
+          "selector": "img",
+          "hierarchy": "sibling"
+        }
+      }
+    },
+    "sudonautRoyalties": {
+      "item": {
+        "node": {
+          "selector": "app-manage main > .container > div:first-child",
+          "injectionMethod": "append"
+        }
+      },
+      "list": {
+        "node": {
+          "selector": "app-pool .poolItem",
+          "injectionMethod": "insertBefore"
+        }
+      }
+    }
+  },
+  "routes": {
+    "traitFloor": {
+      "url": "https://opensea.io/collection/{collectionSlug}?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]={name}&search[stringTraits][0][values][0]={value}&search[toggles][0]=BUY_NOW",
+      "as": "https://opensea.io/collection/{collectionSlug}?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]={name}&search[stringTraits][0][values][0]={value}&search[toggles][0]=BUY_NOW"
+    }
+  }
+}
