@@ -11,7 +11,11 @@ const parseCookies = () => {
   }, {})
 }
 
-const getOpenSeaTheme = () => {
+const getTheme = () => {
+  if (window.location.host.includes('sudoswap.xyz')) return 'dark'
+  if (window.location.host.includes('gem.xyz'))
+    return document.querySelector('html')?.getAttribute('data-theme') || 'light'
+
   const { theme } = parseCookies()
   return theme?.theme || 'light'
 }
@@ -19,7 +23,7 @@ const getOpenSeaTheme = () => {
 const theme = extendTheme({
   config: {
     useSystemColorMode: false,
-    initialColorMode: getOpenSeaTheme(),
+    initialColorMode: getTheme(),
   },
 })
 

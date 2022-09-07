@@ -73,26 +73,7 @@ div[role='list'] div[role='listitem'] .sc-q7w47o-0 .SuperSea__AssetInfo {
   border-color: white;
 }
 
-.SuperSea__ListingNotifier {
-  padding: 10px 30px;
-}
-
 .SuperSea__ProfileSummary {
   width: 100%;
   margin-bottom: 30px;
-}
-
-@keyframes SuperSea__FadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes SuperSea__Rotate {
-  to {
-    transform: rotate(360deg);
-  }
 }

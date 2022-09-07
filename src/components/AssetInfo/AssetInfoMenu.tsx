@@ -14,6 +14,7 @@ import {
   Spinner,
   HStack,
   useColorModeValue,
+  useToken,
 } from '@chakra-ui/react'
 import _ from 'lodash'
 import { useContext, useState } from 'react'
@@ -26,6 +27,7 @@ import SudoSwapSvg from '../../assets/sudoswap.svg'
 import GemSvg from '../../assets/gemxyz.svg'
 import EtherScanSvg from '../../assets/etherscan.svg'
 import PolygonScanSvg from '../../assets/polygonscan.svg'
+import OpenseaSvg from '../../assets/opensea.svg'
 import { FiMoreHorizontal } from 'react-icons/fi'
 import {
   fetchCollectionAssetsForUser,
@@ -33,6 +35,7 @@ import {
   fetchRemoteConfig,
   fetchMetadataUriWithOpenSeaFallback,
   Chain,
+  Marketplace,
 } from '../../utils/api'
 import { isSubscriber } from '../../utils/user'
 import LockedFeature from '../LockedFeature'
@@ -46,6 +49,7 @@ const AssetInfoMenu = ({
   tokenId,
   collectionSlug,
   chain,
+  marketplace,
   queueRefresh,
   replaceImage,
   isAccountPage,
@@ -56,6 +60,7 @@ const AssetInfoMenu = ({
   tokenId: string
   collectionSlug?: string
   chain: string
+  marketplace: Marketplace
   queueRefresh: () => void
   replaceImage: () => void
   isAccountPage: boolean
@@ -68,6 +73,7 @@ const AssetInfoMenu = ({
 
   const toast = useToast()
   const menuBorder = useColorModeValue('gray.200', 'gray.800')
+  const menuBorderResolved = useToken('colors', menuBorder)
   const menuColor = useColorModeValue('black', 'white')
   const isHiddenTab =
     queryString.parse(window.location.search).tab === 'private'
@@ -81,6 +87,7 @@ const AssetInfoMenu = ({
             icon={<Icon as={FiMoreHorizontal} />}
             size="md"
             position="absolute"
+            zIndex="10"
             top="0"
             bg="transparent"
             height="20px"
@@ -96,6 +103,13 @@ const AssetInfoMenu = ({
               borderColor={menuBorder}
               zIndex="popover"
               color={menuColor}
+              css={{
+                hr: {
+                  border: '0 !important',
+                  height: '1px',
+                  backgroundColor: menuBorderResolved,
+                },
+              }}
               fontSize="sm"
             >
               <MenuGroup
@@ -112,51 +126,57 @@ const AssetInfoMenu = ({
                 }
                 mr="0"
               >
-                <MenuItem
-                  isDisabled={chain === 'polygon'}
-                  onClick={queueRefresh}
-                >
-                  Queue OpenSea refresh
-                </MenuItem>
+                {marketplace === 'opensea' && (
+                  <MenuItem
+                    isDisabled={chain === 'polygon'}
+                    onClick={queueRefresh}
+                  >
+                    Queue OpenSea refresh
+                  </MenuItem>
+                )}
                 <MenuItem
                   isDisabled={chain === 'polygon'}
                   onClick={replaceImage}
                 >
                   Replace image from source
                 </MenuItem>
-                <MenuItem
-                  isDisabled={chain === 'polygon'}
-                  onClick={async () => {
-                    globalConfig.autoQueueAddresses[address] = !globalConfig
-                      .autoQueueAddresses[address]
+                {marketplace === 'opensea' && (
+                  <MenuItem
+                    isDisabled={chain === 'polygon'}
+                    onClick={async () => {
+                      globalConfig.autoQueueAddresses[address] = !globalConfig
+                        .autoQueueAddresses[address]
 
-                    if (!globalConfig.autoQueueAddresses[address]) {
-                      Object.keys(globalConfig.refreshQueued).forEach((key) => {
-                        const [_address] = key.split('/')
-                        if (address === _address) {
-                          globalConfig.refreshQueued[key] = false
-                        }
+                      if (!globalConfig.autoQueueAddresses[address]) {
+                        Object.keys(globalConfig.refreshQueued).forEach(
+                          (key) => {
+                            const [_address] = key.split('/')
+                            if (address === _address) {
+                              globalConfig.refreshQueued[key] = false
+                            }
+                          },
+                        )
+                      }
+
+                      events.emit('toggleAutoQueue', {
+                        value: globalConfig.autoQueueAddresses[address],
+                        address,
                       })
-                    }
-
-                    events.emit('toggleAutoQueue', {
-                      value: globalConfig.autoQueueAddresses[address],
-                      address,
-                    })
-                  }}
-                >
-                  <Text maxWidth="210px">
-                    Mass-queue OpenSea refresh for collection
-                    {isAutoQueued && (
-                      <CheckIcon
-                        width="12px"
-                        height="auto"
-                        display="inline-block"
-                        marginLeft="3px"
-                      />
-                    )}
-                  </Text>
-                </MenuItem>
+                    }}
+                  >
+                    <Text maxWidth="210px">
+                      Mass-queue OpenSea refresh for collection
+                      {isAutoQueued && (
+                        <CheckIcon
+                          width="12px"
+                          height="auto"
+                          display="inline-block"
+                          marginLeft="3px"
+                        />
+                      )}
+                    </Text>
+                  </MenuItem>
+                )}
                 <MenuItem
                   isDisabled={chain === 'polygon'}
                   onClick={async () => {
@@ -334,55 +354,22 @@ const AssetInfoMenu = ({
                   <MenuDivider />
                 </>
               )}
-              {chain === 'ethereum' && (
-                <>
-                  <MenuGroup
-                    // @ts-ignore
-                    title={
-                      <Text>
-                        <Icon
-                          as={SnipedSvg as any}
-                          verticalAlign="middle"
-                          width="1.25em"
-                          height="1.25em"
-                          mt="-1px"
-                          mr="1"
-                        />{' '}
-                        Sniped{' '}
-                        <Tag
-                          fontSize="xs"
-                          mt="-1px"
-                          ml="0.35em"
-                          bg="blue.500"
-                          size="sm"
-                          color="white"
-                          verticalAlign="middle"
-                        >
-                          New
-                        </Tag>
-                      </Text>
-                    }
-                  >
-                    <MenuItem
-                      closeOnSelect={false}
-                      isDisabled={!isSubscriber || chain !== 'ethereum'}
+              <MenuGroup title="Links">
+                <HStack spacing="0" px="1" maxWidth="248px" flexWrap="wrap">
+                  {chain === 'ethereum' && marketplace !== 'opensea' && (
+                    <TooltipIconButton
+                      label="OpenSea"
+                      icon={<Icon as={OpenseaSvg as any} />}
+                      bg="transparent"
                       onClick={async () => {
+                        onClose()
                         window.open(
-                          `https://sniped.lol/assets/ethereum/${address}/${tokenId}`,
+                          `https://opensea.io/assets/${chain}/${address}/${tokenId}`,
                           '_blank',
                         )
                       }}
-                    >
-                      <Text maxWidth="210px">
-                        View snipe analysis on Sniped
-                      </Text>
-                    </MenuItem>
-                  </MenuGroup>
-                  <MenuDivider />
-                </>
-              )}
-              <MenuGroup title="Links">
-                <HStack spacing="0" px="1">
+                    />
+                  )}{' '}
                   {chain === 'ethereum' && (
                     <TooltipIconButton
                       label="LooksRare"
@@ -411,9 +398,9 @@ const AssetInfoMenu = ({
                       }}
                     />
                   )}{' '}
-                  {chain === 'ethereum' && (
+                  {chain === 'ethereum' && marketplace !== 'gem' && (
                     <TooltipIconButton
-                      label="gem.xyz"
+                      label="Gem"
                       icon={<Icon as={GemSvg as any} />}
                       bg="transparent"
                       onClick={async () => {
@@ -425,7 +412,7 @@ const AssetInfoMenu = ({
                       }}
                     />
                   )}{' '}
-                  {chain === 'ethereum' && (
+                  {chain === 'ethereum' && marketplace !== 'sudoswap' && (
                     <TooltipIconButton
                       label="sudoswap"
                       icon={<Icon as={SudoSwapSvg as any} />}
@@ -435,6 +422,21 @@ const AssetInfoMenu = ({
                         onClose()
                         window.open(
                           `https://sudoswap.xyz/#/browse/buy/${address}`,
+                          '_blank',
+                        )
+                      }}
+                    />
+                  )}{' '}
+                  {chain === 'ethereum' && (
+                    <TooltipIconButton
+                      label="Sniped"
+                      icon={<Icon as={SnipedSvg as any} />}
+                      bg="transparent"
+                      fontSize="20px"
+                      onClick={async () => {
+                        onClose()
+                        window.open(
+                          `https://sniped.lol/assets/${chain}/${address}/${tokenId}`,
                           '_blank',
                         )
                       }}

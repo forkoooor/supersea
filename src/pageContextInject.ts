@@ -7,6 +7,7 @@ import {
 } from 'opensea-js'
 import { RateLimit } from 'async-sema'
 import { readableEthValue, weiToEth } from './utils/ethereum'
+import { getLangAgnosticPath } from './utils/route'
 ;((window: any) => {
   // Restore console for debugging
   // const i = document.createElement('iframe')
@@ -173,7 +174,7 @@ import { readableEthValue, weiToEth } from './utils/ethereum'
 
   if (window.next && window.next.router) {
     window.next.router.events.on('routeChangeComplete', (url: string) => {
-      document.body.dataset['superseaPath'] = window.location.pathname
+      document.body.dataset['superseaPath'] = getLangAgnosticPath()
       window.postMessage({
         method: 'SuperSea__Next__routeChangeComplete',
         params: { url: url, scrollY: window.scrollY },

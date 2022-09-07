@@ -1,0 +1,37 @@
+{
+  "injectionSelectors": {
+    "assetInfo": {
+      "grid": {
+        "node": {
+          "selector": ".nft-card",
+          "injectionMethod": "append"
+        },
+        "link": {
+          "selector": "a[href^=\"/asset/\"]",
+          "hierarchy": "child"
+        },
+        "image": {
+          "selector": "img.block.w-full",
+          "hierarchy": "child"
+        }
+      },
+      "item": {
+        "node": {
+          "selector": ".w-full.mb-6  img.block.w-full",
+          "injectionMethod": "insertAfter"
+        },
+
+        "image": {
+          "selector": "img",
+          "hierarchy": "sibling"
+        }
+      }
+    }
+  },
+  "routes": {
+    "traitFloor": {
+      "url": "https://gem.xyz/collection/{contractAddress}?filters=%7B\"{name}\":[\"{value}\"]%7D",
+      "as": "https://gem.xyz/collection/{contractAddress}?filters=%7B\"{name}\":[\"{value}\"]%7D"
+    }
+  }
+}

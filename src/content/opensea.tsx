@@ -2,39 +2,33 @@ import _ from 'lodash'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import queryString from 'query-string'
-import AppProvider from './components/AppProvider'
-import BundleVerification from './components/BundleVerification'
-import AssetInfo from './components/AssetInfo/AssetInfo'
-import ProfileSummary from './components/ProfileSummary'
-import GlobalStyles from './components/GlobalStyles'
-import RarityDisclaimer from './components/RarityDisclaimer'
-import { getExtensionConfig } from './utils/extensionConfig'
-import { fetchGlobalCSS, fetchRemoteConfig, getUser } from './utils/api'
-import { injectElement, selectElement, Selectors } from './utils/selector'
-import SearchResults from './components/SearchResults/SearchResults'
-import CollectionMenuItem from './components/CollectionMenuItem'
-import CollectionStats from './components/CollectionStats'
-import Activity from './components/Activity/Activity'
-import TransferInfo from './components/TransferInfo'
-import { isSubscriber } from './utils/user'
-import { createRouteParams } from './utils/route'
-import ReplacementNotice from './components/Activity/ReplacementNotice'
 
-const NODE_PROCESSED_DATA_KEY = '__SuperSea__Processed'
-
-const addGlobalStyle = () => {
-  const globalContainer = document.createElement('div')
-  document.body.appendChild(globalContainer)
-  injectReact(<GlobalStyles />, globalContainer)
-  fetchGlobalCSS().then((css) => {
-    const style = document.createElement('style')
-    style.textContent = css
-    document.head.appendChild(style)
-  })
-}
+import BundleVerification from '../components/BundleVerification'
+import AssetInfo from '../components/AssetInfo/AssetInfo'
+import ProfileSummary from '../components/ProfileSummary'
+import RarityDisclaimer from '../components/RarityDisclaimer'
+import { getExtensionConfig } from '../utils/extensionConfig'
+import { fetchRemoteConfig, getUser } from '../utils/api'
+import { injectElement, selectElement, Selectors } from '../utils/selector'
+import SearchResults from '../components/SearchResults/SearchResults'
+import CollectionMenuItem from '../components/CollectionMenuItem'
+import CollectionStats from '../components/CollectionStats'
+import Activity from '../components/Activity/Activity'
+import TransferInfo from '../components/TransferInfo'
+import { isSubscriber } from '../utils/user'
+import { createRouteParams, getLangAgnosticPath } from '../utils/route'
+import {
+  addGlobalStyle,
+  destroyRemovedInjections,
+  injectReact,
+  NODE_PROCESSED_DATA_KEY,
+  setCleanupActive,
+  setupAssetInfoRenderer,
+} from './shared'
 
 const injectAssetInfo = async () => {
-  const { injectionSelectors: selectors } = await fetchRemoteConfig()
+  const config = await fetchRemoteConfig()
+  const { injectionSelectors: selectors } = config
 
   const gridNodes = Array.from(
     document.querySelectorAll(selectors.assetInfo.grid.node.selector),
@@ -153,33 +147,8 @@ const injectAssetInfo = async () => {
     container.dataset['tokenId'] = tokenId
     container.dataset['collectionSlug'] = collectionSlug
     container.dataset['chain'] = chain
+    container.dataset['marketplace'] = 'opensea'
     container.dataset['type'] = type
-  })
-}
-
-let injectedReactContainers: ReactDOM.Container[] = []
-const injectReact = (
-  content: React.ReactElement,
-  target: ReactDOM.Container,
-  opts?: { callback?: () => void; autoDestroy?: boolean },
-) => {
-  if (opts?.autoDestroy !== false) {
-    injectedReactContainers.push(target)
-  }
-  ReactDOM.render(<AppProvider>{content}</AppProvider>, target, opts?.callback)
-}
-
-let cleanupActive = true
-const destroyRemovedInjections = () => {
-  window.requestIdleCallback(() => {
-    if (!cleanupActive) return
-    injectedReactContainers = injectedReactContainers.filter((container) => {
-      if (!document.body.contains(container)) {
-        ReactDOM.unmountComponentAtNode(container as Element)
-        return false
-      }
-      return true
-    })
   })
 }
 
@@ -300,7 +269,7 @@ const injectSearchResults = async () => {
 
     container.replaceWith(reactContainer)
     window.scrollTo({ top: previouslyRenderedSearchResults.scrollY })
-    cleanupActive = false
+    setCleanupActive(false)
 
     const messageListener = (event: MessageEvent) => {
       if (event.data.method === 'SuperSea__Next__routeChangeStart') {
@@ -311,7 +280,7 @@ const injectSearchResults = async () => {
           collectionMenu.classList.remove('SuperSea--tabActive')
         }
         window.removeEventListener('message', messageListener)
-        cleanupActive = true
+        setCleanupActive(true)
       }
     }
 
@@ -449,7 +418,7 @@ const injectCollectionStats = async () => {
     container as HTMLElement,
     selectors.collectionStats.node.injectionMethod,
   )
-  const collectionSlug = window.location.pathname.split('/').filter(Boolean)[1]
+  const collectionSlug = getLangAgnosticPath().split('/').filter(Boolean)[1]
   injectReact(<CollectionStats collectionSlug={collectionSlug} />, container)
 }
 
@@ -463,7 +432,6 @@ const setupInjections = async () => {
   injectCollectionStats()
   injectProfileSummary()
   injectActivity()
-  injectListingNotifier()
   injectTransferInfo()
 
   const observer = new MutationObserver(() => {
@@ -471,7 +439,6 @@ const setupInjections = async () => {
     throttledInjectAssetInfo()
     throttledInjectCollectionMenu()
     throttledInjectCollectionStats()
-    throttledInjectListingNotifier()
     throttledDestroyRemovedInjections()
     throttledInjectActivity()
     throttledInjectTransferInfo()
@@ -483,46 +450,6 @@ const setupInjections = async () => {
     childList: true,
     subtree: true,
   })
-}
-
-const setupAssetInfoRenderer = () => {
-  const render = () => {
-    try {
-      const selectedNodes = document.querySelectorAll(
-        '.SuperSea__AssetInfo--Unrendered',
-      )
-      if (selectedNodes.length !== 0) {
-        const nodes = [...Array.from(selectedNodes)] as HTMLElement[]
-        nodes.forEach((node: HTMLElement) => {
-          const {
-            address,
-            tokenId,
-            chain,
-            type,
-            collectionSlug,
-          } = node.dataset as any
-          injectReact(
-            <AssetInfo
-              address={address}
-              tokenId={tokenId}
-              chain={chain}
-              type={type}
-              collectionSlug={collectionSlug}
-              container={node.parentElement!}
-            />,
-            node,
-          )
-          node.classList.remove('SuperSea__AssetInfo--Unrendered')
-        })
-      }
-    } catch (err) {
-      console.error('AssetInfo inject error', err)
-    }
-    setTimeout(() => {
-      window.requestIdleCallback(render, { timeout: 500 })
-    }, 250)
-  }
-  window.requestIdleCallback(render, { timeout: 500 })
 }
 
 const setupSearchResultsTab = () => {
@@ -540,42 +467,12 @@ const setupSearchResultsTab = () => {
   })
 }
 
-const injectListingNotifier = async () => {
-  const { injectionSelectors: selectors } = await fetchRemoteConfig()
-  const node = document.querySelector(
-    selectors.listingNotifier.node.selector,
-  ) as HTMLElement | null
-  if (node && !node.dataset[NODE_PROCESSED_DATA_KEY]) {
-    node.dataset[NODE_PROCESSED_DATA_KEY] = '1'
-    const container = document.createElement('div')
-    container.classList.add('SuperSea__ListingNotifier')
-    injectElement(
-      node,
-      container,
-      selectors.listingNotifier.node.injectionMethod,
-    )
-    injectReact(<ReplacementNotice />, container)
-  }
-}
-
-const throttledInjectListingNotifier = _.throttle(injectListingNotifier, 250)
-
-// We need to keep the background script alive for webRequest handlers
-const setupKeepAlivePing = () => {
-  setInterval(() => {
-    chrome.runtime.sendMessage({
-      method: 'ping',
-    })
-  }, 5000)
-}
-
 const initialize = async () => {
   const config = await getExtensionConfig()
-  if (config.enabled) {
-    document.body.dataset['superseaPath'] = window.location.pathname
+  if (config.enabled.opensea) {
+    document.body.dataset['superseaPath'] = getLangAgnosticPath()
 
     setupInjections()
-    setupKeepAlivePing()
     addGlobalStyle()
     setupAssetInfoRenderer()
     setupSearchResultsTab()

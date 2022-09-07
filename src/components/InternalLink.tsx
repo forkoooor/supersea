@@ -1,11 +1,10 @@
 import { Link } from '@chakra-ui/react'
 import { forwardRef } from 'react'
-import useRemoteConfig from '../hooks/useRemoteConfig'
-import { RemoteConfig } from '../utils/api'
+import useRemoteConfig, { RemoteConfigs } from '../hooks/useRemoteConfig'
 import { createRouteParams } from '../utils/route'
 
 const InternalLink = forwardRef(
-  <T extends keyof RemoteConfig['routes']>(
+  <T extends keyof RemoteConfigs['opensea']['routes']>(
     {
       route,
       params,
@@ -33,11 +32,17 @@ const InternalLink = forwardRef(
         }
         onClick={(event) => {
           if (event.metaKey || event.ctrlKey || !remoteConfig) return
+          const routeParams = createRouteParams(
+            remoteConfig.routes[route],
+            params,
+          )
+          // Not internal link
+          if (routeParams.as[0] !== '/') return
           event.preventDefault()
           window.postMessage({
             method: 'SuperSea__Navigate',
             params: {
-              ...createRouteParams(remoteConfig.routes[route], params),
+              ...routeParams,
               options: routeOptions,
             },
           })

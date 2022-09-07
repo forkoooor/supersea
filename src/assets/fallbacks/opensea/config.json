@@ -25,8 +25,8 @@
       "as": "/collection/{collectionSlug}?search[sortAscending]=true&search[sortBy]=PRICE&search[toggles][0]=BUY_NOW"
     },
     "traitFloor": {
-      "url": "/collection/{collectionSlug}?search[stringTraits][0][name]={name}&search[stringTraits][0][values][0]={value}&search[sortAscending]=true&search[sortBy]=PRICE",
-      "as": "/collection/{collectionSlug}?search[stringTraits][0][name]={name}&search[stringTraits][0][values][0]={value}&search[sortAscending]=true&search[sortBy]=PRICE"
+      "url": "/collection/{collectionSlug}?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]={name}&search[stringTraits][0][values][0]={value}&search[toggles][0]=BUY_NOW",
+      "as": "/collection/{collectionSlug}?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]={name}&search[stringTraits][0][values][0]={value}&search[toggles][0]=BUY_NOW"
     },
     "profile": {
       "url": "/{identifier}",
@@ -167,11 +167,11 @@
           "injectionMethod": "prepend"
         },
         "link": {
-          "selector": "a[href^=\"/assets\"]",
+          "selector": "a[href^=\"/assets\"], a[href^=\"/zh-CN/assets\"]",
           "hierarchy": "either"
         },
         "collectionLink": {
-          "selector": "a[href^=\"/collection\"]",
+          "selector": "a[href^=\"/collection\"], a[href^=\"/zh-CN/collection\"]",
           "hierarchy": "either"
         },
         "image": {
@@ -185,7 +185,7 @@
           "injectionMethod": "append"
         },
         "link": {
-          "selector": "a[href^=\"/assets\"]",
+          "selector": "a[href^=\"/assets\"], a[href^=\"/zh-CN/assets\"]",
           "hierarchy": "child"
         },
         "collectionLink": {
@@ -203,11 +203,11 @@
           "injectionMethod": "append"
         },
         "link": {
-          "selector": "a[href^=\"/assets\"]",
+          "selector": "a[href^=\"/assets\"], a[href^=\"/zh-CN/assets\"]",
           "hierarchy": "child"
         },
         "collectionLink": {
-          "selector": "a[href^=\"/collection\"]",
+          "selector": "a[href^=\"/collection\"], a[href^=\"/zh-CN/collection\"]",
           "hierarchy": "child"
         },
         "image": {
@@ -236,42 +236,6 @@
     "searchResults": {
       "menuSelector": "body[data-supersea-path^=\"/collection/\"] ul.sc-151637b-1 .sc-151637b-2",
       "containerSelector": ".AssetSearchView--main, .collection--ActivityTabSection"
-    },
-    "listingNotifier": {
-      "node": {
-        "selector": ".collection--ActivityTabSection .fresnel-container ~ .fresnel-container ~ *[class*=\"FlexColumnreact\"]",
-        "injectionMethod": "prepend"
-      },
-      "api": {
-        "staticVariables": {
-          "archetype": null,
-          "categories": null,
-          "chains": null,
-          "count": 100,
-          "cursor": null,
-          "eventTypes": ["AUCTION_CREATED"],
-          "identity": null,
-          "showAll": true
-        },
-        "variablePaths": {
-          "collectionSlug": "collections",
-          "timestamp": "eventTimestamp_Gt"
-        },
-        "resultPaths": {
-          "edges": "data.assetEvents.edges",
-          "asset": "node.assetQuantity.asset",
-          "listingId": "node.relayId",
-          "tokenId": "node.assetQuantity.asset.tokenId",
-          "contractAddress": "node.assetQuantity.asset.assetContract.address",
-          "chain": "node.assetQuantity.asset.assetContract.chain",
-          "name": "node.assetQuantity.asset.name",
-          "collectionName": "node.assetQuantity.asset.collection.name",
-          "image": "node.assetQuantity.asset.displayImageUrl",
-          "price": "node.price.quantity",
-          "currency": "node.price.asset.symbol",
-          "timestamp": "node.eventTimestamp"
-        }
-      }
     }
   }
 }

@@ -9,15 +9,16 @@ import {
   useToast,
   useColorModeValue,
   Tooltip,
+  Icon,
 } from '@chakra-ui/react'
 import TimeAgo from 'react-timeago'
 import {
-  Chain,
   fetchCollectionSlug,
   fetchIsRanked,
   fetchMetadata,
   fetchRarities,
   fetchRemoteConfig,
+  Marketplace,
   triggerOpenSeaMetadataRefresh,
 } from '../../utils/api'
 import Toast from '../Toast'
@@ -39,6 +40,7 @@ import PropertiesModal from './PropertiesModal'
 import { useUser } from '../../utils/user'
 import AssetInfoMenu from './AssetInfoMenu'
 import RarityBadge, { Rarity } from './RarityBadge'
+import { fetchSudoswapPoolNftContractAddress } from '../../utils/web3'
 
 export const HEIGHT = 85
 export const LIST_HEIGHT = 62
@@ -48,10 +50,12 @@ const MEMBERSHIP_ADDRESS = '0x24e047001f0ac15f72689d3f5cd0b0f52b1abdf9'
 const replaceImageRateLimit = RateLimit(3)
 
 const AssetInfo = ({
-  address,
+  address: initialAddress,
+  sudoswapPoolAddress,
   tokenId,
   type,
   container,
+  marketplace,
   collectionSlug: inputCollectionSlug,
   chain,
   displayedPrice,
@@ -59,11 +63,13 @@ const AssetInfo = ({
   isActivityEvent = false,
 }: {
   address: string
+  sudoswapPoolAddress?: string
   tokenId: string
   collectionSlug?: string
   type: 'grid' | 'list' | 'item' | 'sell'
   chain: string
   container: HTMLElement
+  marketplace: Marketplace
   displayedPrice?: string
   quickBuyGasOverride?: null | { fee: number; priorityFee: number }
   isActivityEvent?: boolean
@@ -73,6 +79,7 @@ const AssetInfo = ({
 
   const { isSubscriber } = useUser() || { isSubscriber: false }
 
+  const [address, setAddress] = useState(initialAddress)
   const [rarity, setRarity] = useState<Rarity | null | undefined>(undefined)
   const [refreshState, setRefreshState] = useState<RefreshState>('IDLE')
   const [isAutoQueued, setIsAutoQueued] = useState(false)
@@ -84,9 +91,12 @@ const AssetInfo = ({
 
   const toast = useToast()
   const isMembershipNFT = MEMBERSHIP_ADDRESS === address
-  const isAccountPage = window.location.pathname.split('/')[1] === 'account'
+  const isAccountPage =
+    marketplace === 'opensea' &&
+    window.location.pathname.split('/')[1] === 'account'
 
   const quickBuyAvailable = (() => {
+    if (marketplace !== 'opensea') return false
     if (isAccountPage && !isActivityEvent) return false
     if (type === 'sell') return false
     return true
@@ -216,6 +226,16 @@ const AssetInfo = ({
   }, [address, tokenId, collectionSlug, chain])
 
   useEffect(() => {
+    if (address || !sudoswapPoolAddress) return
+    ;(async () => {
+      const _address = await fetchSudoswapPoolNftContractAddress(
+        sudoswapPoolAddress,
+      )
+      setAddress(_address || '')
+    })()
+  }, [address, sudoswapPoolAddress])
+
+  useEffect(() => {
     if (!(address && tokenId)) return
     ;(async () => {
       if (chain === 'polygon') {
@@ -283,9 +303,10 @@ const AssetInfo = ({
   return (
     <Box
       pr={type === 'list' ? 3 : 0}
-      width={type === 'list' ? '190px' : undefined}
+      width={type === 'list' ? '190px' : '100%'}
     >
       <Flex
+        className="SuperSea__AssetInfoCard"
         height={type === 'list' ? `${LIST_HEIGHT}px` : `${HEIGHT}px`}
         minWidth={type === 'list' ? `${LIST_WIDTH}px` : 0}
         transition="background 250ms ease"
@@ -355,6 +376,7 @@ const AssetInfo = ({
           collectionSlug={collectionSlug}
           tokenId={tokenId}
           chain={chain}
+          marketplace={marketplace}
           isAccountPage={isAccountPage}
           isAutoImageReplaced={isAutoImageReplaced}
           isAutoQueued={isAutoQueued}
@@ -400,7 +422,17 @@ const AssetInfo = ({
                           <TimeAgo date={floorLoadedAt} live={false} />
                         ) : null}
                       </Text>
-                      <Text opacity="0.75" mt="1" mb="0" fontSize="xs">
+                      {marketplace === 'opensea' ? null : (
+                        <Text mb="0" fontSize="xs" opacity="0.75">
+                          Source: OpenSea
+                        </Text>
+                      )}
+                      <Text
+                        opacity="0.75"
+                        mt={marketplace === 'opensea' ? 1 : 2}
+                        mb="0"
+                        fontSize="xs"
+                      >
                         Click to force update
                       </Text>
                     </Box>
@@ -469,6 +501,7 @@ const AssetInfo = ({
           address={address}
           tokenId={tokenId}
           onClose={() => setPropertiesModalOpen(false)}
+          marketplace={marketplace}
         />
       )}
     </Box>
