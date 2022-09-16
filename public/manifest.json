@@ -49,5 +49,5 @@
       "matches": ["https://*.opensea.io/*"]
     }
   ],
-  "permissions": ["webRequest", "storage", "notifications"]
+  "permissions": ["storage", "notifications"]
 }
