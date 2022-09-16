@@ -3396,10 +3396,10 @@
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
 
-"@opensea/seaport-js@^1.0.2":
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/@opensea/seaport-js/-/seaport-js-1.0.5.tgz#f48ebf5e3bc6ff5627502616598b401c6eaf352a"
-  integrity sha512-WgK3Grdqf5PEQWMlSFiSFaL/j8vlJ3feSjn+frFEO0QH2MuqwlFBRUGwqK4l09o5ZtZDRRTMafgrYC6BOgBY4A==
+"@opensea/seaport-js@^1.0.6":
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/@opensea/seaport-js/-/seaport-js-1.0.6.tgz#876297d4216a356d3ca3335f015f1d1f90a53d3d"
+  integrity sha512-XHVNjlr3UOJbX64MoxcztUSEbYtl5x33wuby+ysQKGJUyAfsO7ZdLgwyE/lK7nwIWmxJ0zSy3I4+NJWh0DyOEQ==
   dependencies:
     "@0xsequence/multicall" "^0.39.0"
     ethers "^5.6.7"
@@ -15255,12 +15255,12 @@ open@^7.0.2, open@^7.0.3, open@^7.4.2:
     is-docker "^2.0.0"
     is-wsl "^2.1.1"
 
-opensea-js@^4.0.7:
-  version "4.0.7"
-  resolved "https://registry.yarnpkg.com/opensea-js/-/opensea-js-4.0.7.tgz#06f7638b55ce242b5205a379099d0a8032584b0d"
-  integrity sha512-KjKtXos4bmmxjpSPLfVNq7DyGOBkKs8SCC7B5Sd4Ubc9B2r0UNvL/ILNaXuphKw8ftsq8zQEnLG8ggscLRK78g==
+opensea-js@4.0.11:
+  version "4.0.11"
+  resolved "https://registry.yarnpkg.com/opensea-js/-/opensea-js-4.0.11.tgz#43972a47ff15b59e9e1fd4cdeb06650c3d0e3885"
+  integrity sha512-c3vQncGn8k7C4xEn0GAIlJhyv8fwgXhQOMXb6j82ku7hKzVpsv3u/0eJ2qWTSfj9Cdg99Ao9eq1aIhPXzQg1ng==
   dependencies:
-    "@opensea/seaport-js" "^1.0.2"
+    "@opensea/seaport-js" "^1.0.6"
     ajv "^8.11.0"
     bignumber.js "9.0.2"
     ethereumjs-abi "git+https://github.com/ProjectWyvern/ethereumjs-abi.git"
@@ -15271,8 +15271,8 @@ opensea-js@^4.0.7:
     lodash "^4.17.21"
     query-string "^6.11.1"
     web3 "1.7.0"
-    wyvern-js "git+https://github.com/ProjectOpenSea/wyvern-js.git#d283749f3d983a9c9e2e4da925441f75e170c9f0"
-    wyvern-schemas "git+https://github.com/ProjectOpenSea/wyvern-schemas.git#3290fc095649f5552b560bfcb1f0fa49acf13894"
+    wyvern-js "git+https://github.com/ProjectOpenSea/wyvern-js.git#7429b1f2dd123f012cae1f3144a069e91ecd0682"
+    wyvern-schemas "git+https://github.com/ProjectOpenSea/wyvern-schemas.git#af1fc62dd58144b60487df690c77dcf8daa45669"
 
 opn@^5.5.0:
   version "5.5.0"
@@ -22134,9 +22134,9 @@ ws@~8.2.3:
   resolved "https://registry.yarnpkg.com/ws/-/ws-8.2.3.tgz#63a56456db1b04367d0b721a0b80cae6d8becbba"
   integrity sha512-wBuoj1BDpC6ZQ1B7DWQBYVLphPWkm8i9Y0/3YdHjHKHiohOJ1ws+3OccDWtH+PoC9DZD5WOTrJvNbWvjS6JWaA==
 
-"wyvern-js@git+https://github.com/ProjectOpenSea/wyvern-js.git#d283749f3d983a9c9e2e4da925441f75e170c9f0":
+"wyvern-js@git+https://github.com/ProjectOpenSea/wyvern-js.git#7429b1f2dd123f012cae1f3144a069e91ecd0682":
   version "3.2.0"
-  resolved "git+https://github.com/ProjectOpenSea/wyvern-js.git#d283749f3d983a9c9e2e4da925441f75e170c9f0"
+  resolved "git+https://github.com/ProjectOpenSea/wyvern-js.git#7429b1f2dd123f012cae1f3144a069e91ecd0682"
   dependencies:
     "@0x/assert" "3.0.31"
     "@0x/base-contract" "6.4.2"
@@ -22152,9 +22152,9 @@ ws@~8.2.3:
     lodash "^4.17.21"
     web3 "^1.7.0"
 
-"wyvern-schemas@git+https://github.com/ProjectOpenSea/wyvern-schemas.git#3290fc095649f5552b560bfcb1f0fa49acf13894":
+"wyvern-schemas@git+https://github.com/ProjectOpenSea/wyvern-schemas.git#af1fc62dd58144b60487df690c77dcf8daa45669":
   version "0.14.1"
-  resolved "git+https://github.com/ProjectOpenSea/wyvern-schemas.git#3290fc095649f5552b560bfcb1f0fa49acf13894"
+  resolved "git+https://github.com/ProjectOpenSea/wyvern-schemas.git#af1fc62dd58144b60487df690c77dcf8daa45669"
   dependencies:
     axios "^0.17.1"
     bignumber.js "9.0.2"
