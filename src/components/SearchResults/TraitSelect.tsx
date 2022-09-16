@@ -21,6 +21,7 @@ const TraitSelect = ({
   isDisabled?: boolean
 }) => {
   const [focused, setFocused] = useState(false)
+  const [defaultValue, setDefaultValue] = useState(value)
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [menuPlacement, setMenuPlacement] = useState<'above' | 'below'>('below')
   const options = useMemo(() => {
@@ -94,13 +95,14 @@ const TraitSelect = ({
     >
       <Box position="relative" width="100%">
         <SelectSearch
+          key={defaultValue.join(',')}
           options={options as any}
           search
           disabled={isDisabled}
           closeOnSelect={false}
           multiple
           printOptions="on-focus"
-          value={value}
+          value={defaultValue}
           filterOptions={(_options) => {
             return (value) => {
               if (!value) return _options
@@ -124,9 +126,7 @@ const TraitSelect = ({
           onBlur={() => setFocused(false)}
           onFocus={() => setFocused(true)}
           onChange={(value: any) => {
-            // Defer update to hack around a bug where internal and external
-            // value state starts to mismatch
-            setTimeout(() => onChange(value), 0)
+            onChange(value)
           }}
           renderValue={(valueProps) => {
             return (
@@ -205,7 +205,11 @@ const TraitSelect = ({
               key={val}
               traitJson={val}
               closeable
-              onClickClose={() => onChange(value.filter((v) => v !== val))}
+              onClickClose={() => {
+                const newValue = value.filter((v) => v !== val)
+                setDefaultValue(newValue)
+                onChange(newValue)
+              }}
             />
           )
         })}
