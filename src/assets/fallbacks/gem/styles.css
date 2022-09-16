@@ -1,10 +1,13 @@
 .mason div[show-rarity],
-.nft-card {
+.nft-card,
+.mason div[show-rarity],
+.nftcard {
   padding-bottom: 85px;
   position: relative;
 }
 
-.nft-card .absolute.bottom-20 {
+.nft-card .absolute.bottom-20,
+.nftcard .absolute.bottom-20 {
   bottom: calc(5rem + 85px);
 }
 
@@ -20,4 +23,9 @@
 .SuperSea__AssetInfoCard {
   border-bottom-left-radius: 0.75rem !important;
   border-bottom-right-radius: 0.75rem !important;
+}
+
+/* TOOD: Fix in component? */
+.SuperSea__AssetInfoCard .chakra-menu__menu-button {
+  z-index: 1 !important;
 }

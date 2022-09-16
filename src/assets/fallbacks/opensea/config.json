@@ -163,7 +163,7 @@
       },
       "list": {
         "node": {
-          "selector": "div[role=\"listitem\"] .AssetCell--container, div[role=\"listitem\"] .sc-q7w47o-0",
+          "selector": "*[data-testid='ActivityTable'] div[width='300px']:nth-child(2), *[data-testid='ActivityTable'] div[width='150px']:nth-child(2)",
           "injectionMethod": "prepend"
         },
         "link": {
@@ -199,7 +199,7 @@
       },
       "sell": {
         "node": {
-          "selector": "article.sc-1hvmhz3-2",
+          "selector": "body[data-supersea-path$=\"/sell\"] article",
           "injectionMethod": "append"
         },
         "link": {
@@ -223,18 +223,18 @@
     },
     "profileSummary": {
       "node": {
-        "selector": "body:not([data-supersea-path^=\"/collection/\"]):not([data-supersea-path=\"\"]):not([data-supersea-path^=\"/rankings\"]) *[data-testid=\"ProfilePage--navbar\"]",
+        "selector": "body:not([data-supersea-path^=\"/collection/\"]):not([data-supersea-path=\"\"]):not([data-supersea-path^=\"/rankings\"]):not([data-supersea-path=\"/\"]) *[data-testid=\"ProfilePage--navbar\"]",
         "injectionMethod": "insertBefore"
       }
     },
     "collectionStats": {
       "node": {
-        "selector": "body[data-supersea-path^=\"/collection/\"] .sc-1y1ib3i-3",
-        "injectionMethod": "insertAfter"
+        "selector": "body[data-supersea-path^=\"/collection/\"] *[data-testid=\"ProfilePage--navbar\"]",
+        "injectionMethod": "insertBefore"
       }
     },
     "searchResults": {
-      "menuSelector": "body[data-supersea-path^=\"/collection/\"] ul.sc-151637b-1 .sc-151637b-2",
+      "menuSelector": "body[data-supersea-path^=\"/collection/\"] main nav ul > div",
       "containerSelector": ".AssetSearchView--main, .collection--ActivityTabSection"
     }
   }
