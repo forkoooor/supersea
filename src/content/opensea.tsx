@@ -412,7 +412,7 @@ const injectCollectionStats = async () => {
   injectionNode.dataset[NODE_PROCESSED_DATA_KEY] = '1'
 
   const container = document.createElement('div')
-  container.classList.add('SuperSea__TransferInfo')
+  container.classList.add('SuperSea__CollectionStats')
   injectElement(
     injectionNode as HTMLElement,
     container as HTMLElement,
