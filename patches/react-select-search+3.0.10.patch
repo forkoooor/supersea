@@ -1,0 +1,23 @@
+diff --git a/node_modules/react-select-search/dist/esm/useSelect.js b/node_modules/react-select-search/dist/esm/useSelect.js
+index 0a32060..b9cba73 100644
+--- a/node_modules/react-select-search/dist/esm/useSelect.js
++++ b/node_modules/react-select-search/dist/esm/useSelect.js
+@@ -5,6 +5,7 @@ import groupOptions from './lib/groupOptions';
+ import getOptions from './lib/getOptions';
+ import getDisplayValue from './lib/getDisplayValue';
+ import useFetch from './useFetch';
++import flattenOptions from './lib/flattenOptions';
+ import getValues from './lib/getValues';
+ import useHighlight from './useHighlight';
+ export default function useSelect(_ref) {
+@@ -88,7 +89,7 @@ export default function useSelect(_ref) {
+     onMouseDown
+   }), [onMouseDown]);
+   useEffect(() => {
+-    setValue(getOptions(defaultValue, null, options, multiple));
+-  }, [defaultValue, multiple, options]);
++    setValue(getOptions(defaultValue, null, flattenOptions(defaultOptions), multiple));
++  }, []);
+   return [snapshot, valueProps, optionProps, setValue];
+ }
+\ No newline at end of file

@@ -38,7 +38,7 @@
     "react-intersection-observer": "^8.32.1",
     "react-medium-image-zoom": "^4.3.7",
     "react-scripts": "4.0.3",
-    "react-select-search": "^3.0.8",
+    "react-select-search": "3.0.10",
     "react-timeago": "^6.2.1",
     "sb": "^6.3.10",
     "socket.io-client": "^4.5.1",
