@@ -3,7 +3,7 @@
     "assetInfo": {
       "grid": {
         "node": {
-          "selector": ".nft-card",
+          "selector": ".nft-card, .nftcard",
           "injectionMethod": "append"
         },
         "link": {
