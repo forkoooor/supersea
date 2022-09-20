@@ -2,6 +2,7 @@ import _ from 'lodash'
 import { useEffect, useRef, useState } from 'react'
 import { Event } from '../components/Activity/ActivityEvent'
 import { fetchOpenSeaGraphQL, fetchRemoteConfig } from '../utils/api'
+import { ethToWei } from '../utils/ethereum'
 import { useExtensionConfig } from '../utils/extensionConfig'
 import openseaStream from '../utils/openseaStream'
 
@@ -135,7 +136,9 @@ const useActivity = ({
               chain: chain === 'MATIC' ? 'polygon' : 'ethereum',
               name: _.get(edge, paths.name) || `#${_.get(edge, paths.tokenId)}`,
               image: _.get(edge, paths.image),
-              price: _.get(edge, paths.price),
+              price: remoteConfig.queries['EventHistoryPollQuery'].priceInEth
+                ? ethToWei(+_.get(edge, paths.price))
+                : _.get(edge, paths.price),
               currency: _.get(edge, paths.currency),
               sellerAddress: _.get(edge, paths.sellerAddress),
               blockExplorerLink: _.get(edge, paths.blockExplorerLink),

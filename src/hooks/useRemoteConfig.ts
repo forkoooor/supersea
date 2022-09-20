@@ -54,6 +54,7 @@ export type RemoteConfigs = {
           timestamp: string
           eventType: string
         }
+        priceInEth: boolean
       }
       EventHistoryQuery: {
         body: string
@@ -78,6 +79,7 @@ export type RemoteConfigs = {
           timestamp: string
           eventType: string
         }
+        priceInEth: boolean
       }
       AssetSelectionSetPrivacyMutation: {
         body: string

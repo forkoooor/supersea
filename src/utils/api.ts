@@ -21,6 +21,12 @@ const fallbacks: Record<Marketplace, { config: any; styles: string }> = {
   },
 }
 
+const configVersionAffixes: Record<Marketplace, string> = {
+  opensea: '_v2',
+  sudoswap: '',
+  gem: '',
+}
+
 // Parcel will inline the string
 try {
   const fs = require('fs')
@@ -175,9 +181,9 @@ export const fetchRemoteConfig = <T extends Marketplace = 'opensea'>(
   if (!remoteConfigPromise) {
     // Fallback to last known selectors if request takes more than 5 seconds
     remoteConfigPromise = Promise.race<Promise<RemoteConfigs[Marketplace]>>([
-      fetch(`${REMOTE_ASSET_BASE}/${marketplace}/config.json`).then((res) =>
-        res.json(),
-      ),
+      fetch(
+        `${REMOTE_ASSET_BASE}/${marketplace}/config${configVersionAffixes[marketplace]}.json`,
+      ).then((res) => res.json()),
       new Promise((_, reject) => {
         setTimeout(() => reject(new Error('timeout')), 5000)
       }),
