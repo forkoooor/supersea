@@ -79,6 +79,11 @@ import { getLangAgnosticPath } from './utils/route'
           )
         }
 
+        if (order.protocol_data.parameters.salt.length % 2) {
+          order.protocol_data.parameters.salt =
+            '0' + order.protocol_data.parameters.salt
+        }
+
         await openseaSDK.fulfillOrder({
           order: deserializeOrder(order),
           accountAddress: await getEthAccount(),
