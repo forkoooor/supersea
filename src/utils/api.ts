@@ -316,7 +316,7 @@ export const floorPriceLoader = new DataLoader(
     const [slug] = keys
     await openSeaPublicRateLimit()
     const { stats } = await fetch(
-      `https://api.opensea.io/api/v1/collection/${slug}/stats`,
+      `https://api.opensea.io/api/v1/collection/${slug}/stats?v=${Date.now()}`,
     ).then((res) => res.json())
     return [
       {
