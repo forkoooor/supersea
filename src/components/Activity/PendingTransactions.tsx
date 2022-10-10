@@ -72,7 +72,7 @@ const PendingTransactions = ({
   const highestPriority = _.maxBy(mergedPending, 'priorityFee')!
 
   const canQuickBuy =
-    true || (config?.quickBuyEnabled && highestPriority.fromAddress !== 'SELF')
+    config?.quickBuyEnabled && highestPriority.fromAddress !== 'SELF'
 
   const minPendingSessionBlockNumber = Math.min(
     ...mergedPending.map((p) => p.sessionBlockNumber),
