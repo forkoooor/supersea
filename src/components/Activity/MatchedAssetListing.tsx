@@ -20,6 +20,7 @@ import { PendingTransaction as PendingTransactionType } from '../../hooks/usePen
 import PendingTransactions from './PendingTransactions'
 import { Sale } from '../../hooks/useActivity'
 import Sold from './Sold'
+import { SentTransaction } from '../AssetInfo/BuyNowButton'
 
 export type MatchedAsset = {
   listingId: string
@@ -39,10 +40,12 @@ const MatchedAssetListing = memo(
   ({
     asset,
     pendingTransactions,
+    sentTransactions,
     sale,
   }: {
     asset: MatchedAsset
     pendingTransactions?: PendingTransactionType[]
+    sentTransactions: SentTransaction[]
     sale?: Sale
   }) => {
     const [container, setContainer] = useState<HTMLDivElement | null>(null)
@@ -77,7 +80,13 @@ const MatchedAssetListing = memo(
           <Box height={LIST_HEIGHT} width={LIST_WIDTH} />
         )}
         <HStack flex="1 1 auto" spacing="3" position="relative">
-          <Box flex="0 0 48px" width="48px" height="48px">
+          <Box
+            flex="0 0 48px"
+            width="48px"
+            height="48px"
+            borderRadius="md"
+            bg={useColorModeValue('blackAlpha.100', 'blackAlpha.200')}
+          >
             <ImageZoom>
               <Image
                 src={asset.image}
@@ -127,6 +136,7 @@ const MatchedAssetListing = memo(
                   return addedAt >= +new Date(asset.timestamp + 'Z') - 5000
                 },
               )}
+              sentTransactions={sentTransactions}
             />
           )}
           <Flex

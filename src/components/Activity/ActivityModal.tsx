@@ -4,7 +4,6 @@ import {
   ModalContent,
   ModalCloseButton,
   ModalBody,
-  ModalFooter,
   VStack,
   HStack,
   Heading,
@@ -56,6 +55,9 @@ import {
   getPendingTransactionsForCollection,
   PendingTransaction,
 } from '../../hooks/usePendingTransactions'
+import BlockTimer from './BlockTimer'
+import TransactionTracker from './TransactionTracker'
+import { SentTransaction } from '../AssetInfo/BuyNowButton'
 
 let sessionHideStateRestore = false
 
@@ -137,6 +139,7 @@ const ActivityModal = ({
   onClearMatches,
   activeCollectionSlug,
   pendingTransactionRecord,
+  sentTransactionRecord,
   saleRecord,
   activityFilter,
   onChangeActivityFilter,
@@ -165,6 +168,7 @@ const ActivityModal = ({
   activeCollectionSlug?: string
   pendingTransactionRecord: Record<string, PendingTransaction[]>
   saleRecord: Record<string, Sale>
+  sentTransactionRecord: Record<string, SentTransaction>
   activityFilter: ActivityFilter
   onChangeActivityFilter: (filter: ActivityFilter) => void
   playSound: boolean
@@ -232,7 +236,7 @@ const ActivityModal = ({
         <ModalOverlay />
         <ModalContent maxWidth="1340px">
           <ModalCloseButton />
-          <ModalBody px="4" pb="0">
+          <ModalBody px="4" pb="0" position="relative">
             {!hideStateRestore &&
             (storedActivityState?.collections.length ||
               storedActivityState?.notifiers.length) ? (
@@ -445,6 +449,7 @@ const ActivityModal = ({
               mt="8"
               justifyContent="flex-start"
               alignItems="flex-start"
+              pb="3"
             >
               <Box
                 width="100%"
@@ -633,6 +638,14 @@ const ActivityModal = ({
                             `${event.contractAddress}:${event.tokenId}`
                           ]
                         }
+                        sentTransactions={Object.values(
+                          sentTransactionRecord,
+                        ).filter(
+                          ({ asset }) =>
+                            asset.tokenId === event.tokenId &&
+                            asset.contractAddress.toLowerCase() ===
+                              event.contractAddress.toLowerCase(),
+                        )}
                         sale={
                           saleRecord[
                             `${event.sellerAddress}:${event.contractAddress}:${event.tokenId}`
@@ -681,6 +694,14 @@ const ActivityModal = ({
                                 `${asset.contractAddress}:${asset.tokenId}`
                               ]
                             }
+                            sentTransactions={Object.values(
+                              sentTransactionRecord,
+                            ).filter(
+                              ({ asset: _asset }) =>
+                                _asset.tokenId === asset.tokenId &&
+                                _asset.contractAddress.toLowerCase() ===
+                                  asset.contractAddress.toLowerCase(),
+                            )}
                             sale={
                               saleRecord[
                                 `${asset.sellerAddress}:${asset.contractAddress}:${asset.tokenId}`
@@ -707,8 +728,39 @@ const ActivityModal = ({
                 ) : null}
               </Box>
             </HStack>
+            <Box
+              position="sticky"
+              zIndex="overlay"
+              bottom="0"
+              left="0"
+              width="auto"
+              mx="-4"
+              borderBottomRightRadius="md"
+              borderBottomLeftRadius="md"
+              borderTop={useColorModeValue('1px solid', 'none')}
+              borderColor={borderColor}
+              bg={useColorModeValue('white', 'gray.700')}
+            >
+              <Flex
+                borderBottomRightRadius="md"
+                borderBottomLeftRadius="md"
+                bg={useColorModeValue('transparent', 'blackAlpha.400')}
+                px="3"
+                height="52px"
+                py="1.5"
+                justifyContent="space-between"
+                overflow="hidden"
+              >
+                <Box maxWidth="calc(100% - 150px)">
+                  <TransactionTracker
+                    sentTransactionRecord={sentTransactionRecord}
+                    pendingTransactionRecord={pendingTransactionRecord}
+                  />
+                </Box>
+                <BlockTimer />
+              </Flex>
+            </Box>
           </ModalBody>
-          <ModalFooter />
         </ModalContent>
       </Modal>
     </ScopedCSSPortal>

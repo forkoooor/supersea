@@ -124,7 +124,8 @@ const useActivity = ({
 
         const events = _.get(json, paths.edges)
           .map((edge: any) => {
-            if (!_.get(edge, paths.asset)) return null
+            if (!_.get(edge, paths.asset) || !_.get(edge, paths.tokenId))
+              return null
             const chain = _.get(edge, paths.chain)
             const id = _.get(edge, paths.listingId)
             const eventType = _.get(edge, paths.eventType)
