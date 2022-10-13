@@ -27,6 +27,7 @@ import ActivityModal, { prepareCollection } from './ActivityModal'
 import { Collection } from './WatchedCollection'
 import Toast from '../Toast'
 import usePendingTransactions from '../../hooks/usePendingTransactions'
+import { getLangAgnosticPath } from '../../utils/route'
 
 // Keep state cached so it's not lost when component is unmounted from
 // navigating on OpenSea
@@ -191,10 +192,9 @@ const Activity = () => {
             color="white"
             iconSpacing="3"
             onClick={() => {
-              if (window.location.pathname.startsWith('/collection')) {
-                setActiveCollectionSlug(
-                  window.location.pathname.split('/').filter(Boolean)[1],
-                )
+              const path = getLangAgnosticPath()
+              if (path.startsWith('/collection')) {
+                setActiveCollectionSlug(path.split('/').filter(Boolean)[1])
               }
               modalDisclosure.onOpen()
             }}

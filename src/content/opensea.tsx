@@ -235,7 +235,8 @@ let previouslyRenderedSearchResults: {
 }
 
 const injectSearchResults = async () => {
-  const collectionSlug = window.location.pathname.split('/').filter(Boolean)[1]
+  const path = getLangAgnosticPath()
+  const collectionSlug = path.split('/').filter(Boolean)[1]
 
   const { injectionSelectors: selectors } = await fetchRemoteConfig()
   const container = document.querySelector(
@@ -303,9 +304,8 @@ const injectCollectionMenu = async () => {
       <CollectionMenuItem
         type="items"
         onClick={() => {
-          const collectionSlug = window.location.pathname
-            .split('/')
-            .filter(Boolean)[1]
+          const path = getLangAgnosticPath()
+          const collectionSlug = path.split('/').filter(Boolean)[1]
 
           window.postMessage({
             method: 'SuperSea__Navigate',
