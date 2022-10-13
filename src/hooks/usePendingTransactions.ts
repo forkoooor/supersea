@@ -4,6 +4,7 @@ import { getUser } from '../utils/api'
 import { useUser } from '../utils/user'
 import { Sale } from './useActivity'
 import { io, Socket } from 'socket.io-client'
+import blockTimer from '../utils/blockTimer'
 
 export type PendingTransaction = {
   hash: string
@@ -11,10 +12,10 @@ export type PendingTransaction = {
   priorityFee: number
   maxPriorityFeePerGas: number | null
   maxFeePerGas: number | null
-  isLegacy: boolean
   contractAddress: string
   tokenId: string
   addedAt: number
+  sessionBlockNumber: number
 }
 
 const connectSocket = async (socket: Socket, refreshAccessToken = false) => {
@@ -169,6 +170,7 @@ const usePendingTransactions = ({
             .concat([
               {
                 ...pendingTransaction,
+                sessionBlockNumber: blockTimer.getSessionBlockNumber(),
                 addedAt: Date.now(),
               },
             ])

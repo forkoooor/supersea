@@ -6,6 +6,7 @@ import { Center } from '@chakra-ui/react'
 import ActivityModal from '../components/Activity/ActivityModal'
 import { Event } from '../components/Activity/ActivityEvent'
 import { gweiToWei } from '../utils/ethereum'
+import { SentTransaction } from '../components/AssetInfo/BuyNowButton'
 
 export default {
   title: 'ActivityModal',
@@ -79,10 +80,10 @@ const pendingTransactionRecord = {
       fromAddress: '0x123',
       contractAddress: '0x1a92f7381b9f03921564a437210bb9396471050c',
       addedAt: Date.now(),
-      isLegacy: false,
-      priorityFee: gweiToWei(2.5),
-      maxPriorityFeePerGas: gweiToWei(2.5),
+      priorityFee: gweiToWei(25),
+      maxPriorityFeePerGas: gweiToWei(25),
       maxFeePerGas: gweiToWei(50),
+      sessionBlockNumber: 2,
     },
     {
       hash: '2',
@@ -93,7 +94,7 @@ const pendingTransactionRecord = {
       priorityFee: gweiToWei(15),
       maxPriorityFeePerGas: null,
       maxFeePerGas: null,
-      isLegacy: true,
+      sessionBlockNumber: 2,
     },
     {
       hash: '3',
@@ -104,7 +105,7 @@ const pendingTransactionRecord = {
       priorityFee: gweiToWei(15),
       maxPriorityFeePerGas: null,
       maxFeePerGas: null,
-      isLegacy: true,
+      sessionBlockNumber: 2,
     },
   ],
 }
@@ -116,6 +117,25 @@ const saleRecord = {
     chain: 'ethereum',
     timestamp: Date.now() + 1000,
     hash: '0xa86e72b4888501561b58f67fbafa167dd25f779888a1cc1113f92c06018a12b8',
+  },
+}
+
+const sentTransactionRecord: Record<string, SentTransaction> = {
+  '1': {
+    asset: {
+      tokenId: '100',
+      contractAddress: '0x1a92f7381b9f03921564a437210bb9396471050c',
+      name: 'Cool Cat #100',
+      image:
+        'https://lh3.googleusercontent.com/C7ZN75ly1rxvZ_LpRlfm5Q6GD5lbedmfubhmGHIvUxXawh7-nhXKvl_UIvOjuYrWFPmiYbr4wJn4hA1WRUbYXBiakSFuKLhZth2smvY=w600',
+    },
+    addedAt: Date.now(),
+    updatedAt: Date.now(),
+    status: 'PENDING',
+    hash: '5',
+    priorityFee: gweiToWei(13),
+    maxPriorityFeePerGas: gweiToWei(13),
+    sessionBlockNumber: 1,
   },
 }
 
@@ -154,6 +174,7 @@ Default.args = {
   events: DEFAULT_EVENTS,
   pendingTransactionRecord,
   saleRecord,
+  sentTransactionRecord,
   matchedAssets: [
     {
       listingId: '1',

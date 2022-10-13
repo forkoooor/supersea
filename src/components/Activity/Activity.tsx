@@ -259,6 +259,7 @@ const Activity = () => {
           events={activityState.filteredEvents}
           pendingTransactionRecord={pendingTransactionRecord}
           saleRecord={activityState.saleRecord}
+          sentTransactionRecord={{}}
           playSound={playSound}
           onChangePlaySound={setPlaySound}
           sendNotification={sendNotification}

@@ -25,6 +25,22 @@ const readableError = (message: string) => {
   return `Unable to buy item. Received error "${message}"`
 }
 
+export type SentTransaction = {
+  hash: string
+  addedAt: number
+  status: 'PENDING' | 'CONFIRMED' | 'FAILED' | 'DENIED'
+  updatedAt: number
+  asset: {
+    contractAddress: string
+    tokenId: string
+    name: string
+    image: string
+  }
+  priorityFee: number | null
+  maxPriorityFeePerGas: number | null
+  sessionBlockNumber: number
+}
+
 export const triggerQuickBuy = async ({
   isFounder,
   toast,

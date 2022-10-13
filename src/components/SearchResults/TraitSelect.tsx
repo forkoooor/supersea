@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, memo, useRef, useState } from 'react'
 import { CheckIcon } from '@chakra-ui/icons'
 import { FaListUl } from 'react-icons/fa'
 import { Input, useColorModeValue, Text, Box, Flex } from '@chakra-ui/react'
@@ -218,4 +218,9 @@ const TraitSelect = ({
   )
 }
 
-export default TraitSelect
+export default memo(TraitSelect, (prevProps, nextProps) => {
+  return (
+    prevProps.value.join(',') === nextProps.value.join(',') &&
+    prevProps.traits.length === nextProps.traits.length
+  )
+})

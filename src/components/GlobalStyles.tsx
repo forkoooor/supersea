@@ -1,7 +1,15 @@
+import { useToken, useColorModeValue } from '@chakra-ui/system'
 import { Global } from '@emotion/react'
 import ScopedCSSReset from './ScopedCSSReset'
 
 const GlobalStyles = () => {
+  const blockTimerStrokeColors = useToken(
+    'colors',
+    useColorModeValue(
+      ['green.400', 'yellow.400', 'red.400'],
+      ['green.600', 'yellow.600', 'red.600'],
+    ),
+  )
   return (
     <>
       <Global
@@ -95,6 +103,32 @@ const GlobalStyles = () => {
           @keyframes SuperSea__Rotate {
             to {
               transform: rotate(360deg);
+            }
+          }
+
+          @keyframes SuperSea__BlockTimerStroke {
+            from {
+              stroke: ${blockTimerStrokeColors[0]};
+              opacity: 0;
+            }
+
+            5% {
+              opacity: 1;
+            }
+
+            50% {
+              stroke: ${blockTimerStrokeColors[1]};
+            }
+            
+            to {
+              stroke: ${blockTimerStrokeColors[2]};
+              stroke-dashoffset: -76;
+            }
+          }
+
+          @keyframes SuperSea__BlockTimerBump {
+            50% {
+              transform: scale(1.1);
             }
           }
         `}
