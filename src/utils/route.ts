@@ -19,7 +19,7 @@ export const createRouteParams = (
 export const getLangAgnosticPath = () => {
   const lang = document.querySelector('html')?.getAttribute('lang')
   if (lang) {
-    const regex = new RegExp(`^/(${lang}|zh-CN)/`)
+    const regex = new RegExp(`^/(${lang}|es|ja|fr|zh-CN)/`)
     return window.location.pathname.replace(regex, '/')
   }
   return window.location.pathname
