@@ -28,6 +28,7 @@ import { Collection } from './WatchedCollection'
 import Toast from '../Toast'
 import usePendingTransactions from '../../hooks/usePendingTransactions'
 import { getLangAgnosticPath } from '../../utils/route'
+import useSentTransactions from '../../hooks/useSentTransactions'
 
 // Keep state cached so it's not lost when component is unmounted from
 // navigating on OpenSea
@@ -50,6 +51,7 @@ let cachedState: CachedState = {
 
 const Activity = () => {
   const modalDisclosure = useDisclosure()
+  const sentTransactions = useSentTransactions()
   const [activeCollectionSlug, setActiveCollectionSlug] = useState<
     string | undefined
   >()
@@ -259,7 +261,7 @@ const Activity = () => {
           events={activityState.filteredEvents}
           pendingTransactionRecord={pendingTransactionRecord}
           saleRecord={activityState.saleRecord}
-          sentTransactionRecord={{}}
+          sentTransactions={sentTransactions}
           playSound={playSound}
           onChangePlaySound={setPlaySound}
           sendNotification={sendNotification}

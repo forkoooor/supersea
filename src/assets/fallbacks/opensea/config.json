@@ -52,10 +52,10 @@
         "cursor": null,
         "identity": null,
         "showAll": true,
-        "eventTypes": ["AUCTION_CREATED", "AUCTION_SUCCESSFUL"]
+        "eventTypes": ["AUCTION_CREATED", "AUCTION_SUCCESSFUL"],
+        "count": 1
       },
       "dynamicVariablePaths": {
-        "count": "count",
         "collectionSlugs": "collections"
       },
       "resultPaths": {
@@ -89,10 +89,10 @@
         "cursor": null,
         "identity": null,
         "showAll": true,
-        "eventTypes": ["AUCTION_CREATED", "AUCTION_SUCCESSFUL"]
+        "eventTypes": ["AUCTION_CREATED", "AUCTION_SUCCESSFUL"],
+        "count": 32
       },
       "dynamicVariablePaths": {
-        "count": "count",
         "collectionSlugs": "collections",
         "timestamp": "eventTimestamp_Gt"
       },

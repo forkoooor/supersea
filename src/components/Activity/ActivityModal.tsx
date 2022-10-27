@@ -57,7 +57,7 @@ import {
 } from '../../hooks/usePendingTransactions'
 import BlockTimer from './BlockTimer'
 import TransactionTracker from './TransactionTracker'
-import { SentTransaction } from '../AssetInfo/BuyNowButton'
+import { SentTransaction } from '../../utils/quickBuy'
 
 let sessionHideStateRestore = false
 
@@ -139,7 +139,7 @@ const ActivityModal = ({
   onClearMatches,
   activeCollectionSlug,
   pendingTransactionRecord,
-  sentTransactionRecord,
+  sentTransactions,
   saleRecord,
   activityFilter,
   onChangeActivityFilter,
@@ -168,7 +168,7 @@ const ActivityModal = ({
   activeCollectionSlug?: string
   pendingTransactionRecord: Record<string, PendingTransaction[]>
   saleRecord: Record<string, Sale>
-  sentTransactionRecord: Record<string, SentTransaction>
+  sentTransactions: SentTransaction[]
   activityFilter: ActivityFilter
   onChangeActivityFilter: (filter: ActivityFilter) => void
   playSound: boolean
@@ -638,9 +638,7 @@ const ActivityModal = ({
                             `${event.contractAddress}:${event.tokenId}`
                           ]
                         }
-                        sentTransactions={Object.values(
-                          sentTransactionRecord,
-                        ).filter(
+                        sentTransactions={sentTransactions.filter(
                           ({ asset }) =>
                             asset.tokenId === event.tokenId &&
                             asset.contractAddress.toLowerCase() ===
@@ -694,9 +692,7 @@ const ActivityModal = ({
                                 `${asset.contractAddress}:${asset.tokenId}`
                               ]
                             }
-                            sentTransactions={Object.values(
-                              sentTransactionRecord,
-                            ).filter(
+                            sentTransactions={sentTransactions.filter(
                               ({ asset: _asset }) =>
                                 _asset.tokenId === asset.tokenId &&
                                 _asset.contractAddress.toLowerCase() ===
@@ -753,7 +749,7 @@ const ActivityModal = ({
               >
                 <Box maxWidth="calc(100% - 150px)">
                   <TransactionTracker
-                    sentTransactionRecord={sentTransactionRecord}
+                    sentTransactions={sentTransactions}
                     pendingTransactionRecord={pendingTransactionRecord}
                   />
                 </Box>

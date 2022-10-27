@@ -1,11 +1,12 @@
 import { useToast } from '@chakra-ui/toast'
 import _ from 'lodash'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { Event } from '../components/Activity/ActivityEvent'
 import { Notifier } from '../components/Activity/ListingNotifierForm'
 import { MatchedAsset } from '../components/Activity/MatchedAssetListing'
-import { triggerQuickBuy } from '../components/AssetInfo/BuyNowButton'
+import { EventEmitterContext } from '../components/AppProvider'
 import { readableEthValue, weiToEth } from '../utils/ethereum'
+import { quickBuy } from '../utils/quickBuy'
 import { determineRarityType, RARITY_TYPES } from '../utils/rarity'
 import { useUser } from '../utils/user'
 
@@ -136,6 +137,7 @@ const useNotifier = ({
   isOpen: boolean
 }) => {
   const toast = useToast()
+  const events = useContext(EventEmitterContext)
   const [matchedAssets, setMatchedAssets] = useState<MatchedAsset[]>(
     cachedMatchedAsset,
   )
@@ -209,11 +211,16 @@ const useNotifier = ({
         throttledPlayNotificationSound()
       }
       if (asset.notifier.autoQuickBuy) {
-        triggerQuickBuy({
+        quickBuy({
           isFounder,
+          events,
           address: asset.contractAddress,
           tokenId: asset.tokenId,
           displayedPrice: asset.price,
+          assetMetadata: {
+            name: asset.name,
+            image: asset.image,
+          },
           toast,
           gasOverride: asset.notifier.gasOverride,
           onComplete: () => {},
