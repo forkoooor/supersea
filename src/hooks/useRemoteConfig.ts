@@ -35,7 +35,6 @@ export type RemoteConfigs = {
         dynamicVariablePaths: {
           collectionSlugs: string
           timestamp: string
-          count: string
         }
         resultPaths: {
           edges: string
@@ -62,7 +61,6 @@ export type RemoteConfigs = {
         staticVariables: Record<string, any>
         dynamicVariablePaths: {
           collectionSlugs: string
-          count: string
         }
         resultPaths: {
           edges: string

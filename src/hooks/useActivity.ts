@@ -97,7 +97,6 @@ const useActivity = ({
           ? await fetchOpenSeaGraphQL('EventHistoryQuery', {
               variables: {
                 collectionSlugs,
-                count: 1,
               },
             })
           : await fetchOpenSeaGraphQL('EventHistoryPollQuery', {
@@ -107,7 +106,6 @@ const useActivity = ({
                   pollTimestampRef.current,
                   initialPollTimeRef.current,
                 ),
-                count: 50,
               },
             })
 

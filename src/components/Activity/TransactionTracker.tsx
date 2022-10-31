@@ -1,18 +1,18 @@
 import { Text, HStack, Box } from '@chakra-ui/react'
 import _ from 'lodash'
 import { PendingTransaction } from '../../hooks/usePendingTransactions'
-import { SentTransaction } from '../AssetInfo/BuyNowButton'
+import { SentTransaction } from '../../utils/quickBuy'
 import PendingTransactions from './PendingTransactions'
 
 const TransactionTracker = ({
-  sentTransactionRecord,
+  sentTransactions,
   pendingTransactionRecord,
 }: {
-  sentTransactionRecord: Record<string, SentTransaction>
+  sentTransactions: SentTransaction[]
   pendingTransactionRecord: Record<string, PendingTransaction[]>
 }) => {
   const grouped = _.groupBy(
-    Object.values(sentTransactionRecord),
+    sentTransactions,
     ({ asset }) => `${asset.contractAddress}:${asset.tokenId}`,
   )
 
@@ -28,12 +28,13 @@ const TransactionTracker = ({
         Your transactions:
       </Text>
       <HStack overflow="auto">
-        {Object.entries(grouped).map(([key, sentTransactions]) => {
+        {entries.map(([key, sentTransactions]) => {
           return (
             <Box key={key} flexShrink={0}>
               <PendingTransactions
                 pendingTransactions={pendingTransactionRecord[key]}
                 sentTransactions={sentTransactions}
+                assetMetadata={sentTransactions[0].asset}
                 variant="transactionList"
               />
             </Box>

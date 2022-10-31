@@ -21,7 +21,7 @@ import { PendingTransaction as PendingTransactionType } from '../../hooks/usePen
 import PendingTransactions from './PendingTransactions'
 import { Sale } from '../../hooks/useActivity'
 import Sold from './Sold'
-import { SentTransaction } from '../AssetInfo/BuyNowButton'
+import { SentTransaction } from '../../utils/quickBuy'
 
 export type Event = {
   listingId: string
@@ -68,6 +68,7 @@ const ActivityEvent = memo(
             address={event.contractAddress!}
             tokenId={event.tokenId}
             type="list"
+            assetMetadata={event}
             marketplace="opensea"
             chain={event.chain}
             container={container}
@@ -142,6 +143,7 @@ const ActivityEvent = memo(
                   },
                 )}
                 sentTransactions={sentTransactions}
+                assetMetadata={event}
               />
             )}
             {sale && <Sold sale={sale} />}

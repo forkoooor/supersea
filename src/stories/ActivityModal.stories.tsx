@@ -6,7 +6,7 @@ import { Center } from '@chakra-ui/react'
 import ActivityModal from '../components/Activity/ActivityModal'
 import { Event } from '../components/Activity/ActivityEvent'
 import { gweiToWei } from '../utils/ethereum'
-import { SentTransaction } from '../components/AssetInfo/BuyNowButton'
+import { SentTransaction } from '../utils/quickBuy'
 
 export default {
   title: 'ActivityModal',
@@ -120,8 +120,8 @@ const saleRecord = {
   },
 }
 
-const sentTransactionRecord: Record<string, SentTransaction> = {
-  '1': {
+const sentTransactions: SentTransaction[] = [
+  {
     asset: {
       tokenId: '100',
       contractAddress: '0x1a92f7381b9f03921564a437210bb9396471050c',
@@ -137,7 +137,7 @@ const sentTransactionRecord: Record<string, SentTransaction> = {
     maxPriorityFeePerGas: gweiToWei(13),
     sessionBlockNumber: 1,
   },
-}
+]
 
 let key = 1000
 const Template: Story<
@@ -174,7 +174,7 @@ Default.args = {
   events: DEFAULT_EVENTS,
   pendingTransactionRecord,
   saleRecord,
-  sentTransactionRecord,
+  sentTransactions,
   matchedAssets: [
     {
       listingId: '1',

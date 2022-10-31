@@ -20,7 +20,7 @@ import { PendingTransaction as PendingTransactionType } from '../../hooks/usePen
 import PendingTransactions from './PendingTransactions'
 import { Sale } from '../../hooks/useActivity'
 import Sold from './Sold'
-import { SentTransaction } from '../AssetInfo/BuyNowButton'
+import { SentTransaction } from '../../utils/quickBuy'
 
 export type MatchedAsset = {
   listingId: string
@@ -73,6 +73,7 @@ const MatchedAssetListing = memo(
             marketplace="opensea"
             chain={asset.chain}
             container={container}
+            assetMetadata={asset}
             quickBuyGasOverride={asset.notifier.gasOverride}
             isActivityEvent
           />
@@ -137,6 +138,7 @@ const MatchedAssetListing = memo(
                 },
               )}
               sentTransactions={sentTransactions}
+              assetMetadata={asset}
             />
           )}
           <Flex

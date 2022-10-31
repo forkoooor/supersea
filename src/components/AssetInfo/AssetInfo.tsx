@@ -59,6 +59,7 @@ const AssetInfo = ({
   collectionSlug: inputCollectionSlug,
   chain,
   displayedPrice,
+  assetMetadata,
   quickBuyGasOverride,
   isActivityEvent = false,
 }: {
@@ -71,6 +72,7 @@ const AssetInfo = ({
   container: HTMLElement
   marketplace: Marketplace
   displayedPrice?: string
+  assetMetadata?: { name: string; image: string }
   quickBuyGasOverride?: null | { fee: number; priorityFee: number }
   isActivityEvent?: boolean
 }) => {
@@ -490,6 +492,7 @@ const AssetInfo = ({
               address={address}
               tokenId={tokenId}
               displayedPrice={displayedPrice}
+              assetMetadata={assetMetadata}
               gasOverride={quickBuyGasOverride}
             />
           </Box>

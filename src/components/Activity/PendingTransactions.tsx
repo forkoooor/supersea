@@ -1,3 +1,4 @@
+import { Icon } from '@chakra-ui/icons'
 import {
   useColorModeValue,
   HStack,
@@ -11,36 +12,48 @@ import {
   useToast,
 } from '@chakra-ui/react'
 import _ from 'lodash'
+import { useContext } from 'react'
+import { MdErrorOutline } from 'react-icons/md'
+import { AiOutlineCheckCircle } from 'react-icons/ai'
 import { PendingTransaction as PendingTransactionType } from '../../hooks/usePendingTransactions'
 import useSessionBlockNumber from '../../hooks/useSessionBlockNumber'
 import { readableGweiValue, weiToGwei } from '../../utils/ethereum'
 import { useExtensionConfig } from '../../utils/extensionConfig'
-import { SentTransaction, triggerQuickBuy } from '../AssetInfo/BuyNowButton'
+import { quickBuy, SentTransaction } from '../../utils/quickBuy'
+import { EventEmitterContext } from '../AppProvider'
 
 const PendingTransactions = ({
   pendingTransactions,
   sentTransactions,
+  assetMetadata,
   variant = 'activityList',
 }: {
   pendingTransactions?: PendingTransactionType[]
   sentTransactions: SentTransaction[]
+  assetMetadata?: { name: string; image: string }
   variant?: 'activityList' | 'transactionList'
 }) => {
   const toast = useToast()
+  const events = useContext(EventEmitterContext)
   const sessionBlockNumber = useSessionBlockNumber()
-  const pendingBg = useColorModeValue('gray.100', 'gray.600')
+  const statusBg = useColorModeValue(
+    { PENDING: 'gray.100', FAILED: 'red.100', CONFIRMED: 'green.100' },
+    {
+      PENDING: 'gray.600',
+      FAILED: 'red.600',
+      CONFIRMED: 'green.600',
+    },
+  )
   const imageBg = useColorModeValue('blackAlpha.100', 'blackAlpha.200')
   const [config] = useExtensionConfig()
 
-  if (!pendingTransactions?.length) return null
-
-  const mergedPending = pendingTransactions
+  const mergedPending = (pendingTransactions || [])
     .filter(
       (pending) => !sentTransactions.find((sent) => sent.hash === pending.hash),
     )
     .concat(
       sentTransactions.map((sentTransaction) => {
-        const sentPending = pendingTransactions.find(
+        const sentPending = (pendingTransactions || []).find(
           (pending) => pending.hash === sentTransaction.hash,
         )
         return {
@@ -69,6 +82,7 @@ const PendingTransactions = ({
       return a.sessionBlockNumber - b.sessionBlockNumber
     })
 
+  if (!mergedPending?.length) return null
   const highestPriority = _.maxBy(mergedPending, 'priorityFee')!
 
   const canQuickBuy =
@@ -79,6 +93,13 @@ const PendingTransactions = ({
   )
 
   const blocksLate = sessionBlockNumber - minPendingSessionBlockNumber
+
+  const status = (() => {
+    if (sentTransactions.find((t) => t.status === 'CONFIRMED'))
+      return 'CONFIRMED'
+    if (sentTransactions.find((t) => t.status === 'FAILED')) return 'FAILED'
+    return 'PENDING'
+  })()
 
   return (
     <Tooltip
@@ -184,12 +205,14 @@ const PendingTransactions = ({
         onClick={() => {
           if (!canQuickBuy) return
 
-          triggerQuickBuy({
+          quickBuy({
             isFounder: false, // Doesn't matter when there's a gas override
             toast,
+            events,
             address: highestPriority.contractAddress,
             tokenId: highestPriority.tokenId,
             onComplete: () => {},
+            assetMetadata,
             gasOverride: {
               fee: weiToGwei(
                 (highestPriority.maxFeePerGas || highestPriority.priorityFee) *
@@ -206,7 +229,7 @@ const PendingTransactions = ({
         {variant === 'activityList' ? (
           <HStack
             borderRadius="md"
-            bg={pendingBg}
+            bg={statusBg.PENDING}
             px="2.5"
             py="1"
             spacing="3"
@@ -226,7 +249,7 @@ const PendingTransactions = ({
             borderRadius="md"
             py="1"
             px="2"
-            bg={pendingBg}
+            bg={statusBg[status]}
           >
             <Box width="24px" height="24px" borderRadius="md" bg={imageBg}>
               {sentTransactions![0].asset.image ? (
@@ -250,7 +273,14 @@ const PendingTransactions = ({
                 </Text>
               </HStack>
             </Box>
-            <Spinner width="10px" height="10px" thickness="1px" />
+            {(() => {
+              if (status === 'CONFIRMED')
+                return <Icon as={AiOutlineCheckCircle} fontSize="16px" />
+              if (status === 'FAILED')
+                return <Icon as={MdErrorOutline} fontSize="16px" />
+              if (status === 'PENDING')
+                return <Spinner width="10px" height="10px" thickness="1px" />
+            })()}
           </HStack>
         )}
       </Box>

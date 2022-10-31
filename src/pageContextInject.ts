@@ -4,9 +4,10 @@ import {
   orderFromJSON,
   assetFromJSON,
   deserializeOrder,
+  EventType,
 } from 'opensea-js'
 import { RateLimit } from 'async-sema'
-import { readableEthValue, weiToEth } from './utils/ethereum'
+import { readableEthValue } from './utils/ethereum'
 import { getLangAgnosticPath } from './utils/route'
 ;((window: any) => {
   // Restore console for debugging
@@ -70,7 +71,7 @@ import { getLangAgnosticPath } from './utils/route'
         if (
           event.data.params.displayedPrice &&
           Number(order.base_price || order.current_price) >
-            Number(event.data.params.displayedPrice)
+            Number(event.data.params.displayedPrice) * 1.1
         ) {
           throw new Error(
             `Transaction cancelled due to price change, the actual price was ${readableEthValue(
@@ -84,13 +85,40 @@ import { getLangAgnosticPath } from './utils/route'
             '0' + order.protocol_data.parameters.salt
         }
 
-        await openseaSDK.fulfillOrder({
+        openseaSDK.addListener(
+          EventType.TransactionCreated,
+          ({ transactionHash, event: _event }) => {
+            window.postMessage({
+              method: 'SuperSea__Buy__Sent',
+              params: { ...event.data.params, transactionHash },
+            })
+          },
+        )
+        openseaSDK.addListener(
+          EventType.TransactionDenied,
+          ({ transactionHash, event: _event }) => {
+            window.postMessage({
+              method: 'SuperSea__Buy__Error',
+              params: { ...event.data.params, transactionHash },
+            })
+          },
+        )
+        openseaSDK.addListener(
+          EventType.TransactionFailed,
+          ({ transactionHash, event: _event }) => {
+            window.postMessage({
+              method: 'SuperSea__Buy__Error',
+              params: { ...event.data.params, transactionHash },
+            })
+          },
+        )
+        const transactionHash = await openseaSDK.fulfillOrder({
           order: deserializeOrder(order),
           accountAddress: await getEthAccount(),
         })
         window.postMessage({
           method: 'SuperSea__Buy__Success',
-          params: { ...event.data.params },
+          params: { ...event.data.params, transactionHash },
         })
       } catch (error: any) {
         console.error(error)
