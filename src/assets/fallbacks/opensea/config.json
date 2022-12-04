@@ -237,7 +237,7 @@
     },
     "searchResults": {
       "menuSelector": "body[data-supersea-path^=\"/collection/\"] main nav ul > div",
-      "containerSelector": ".AssetSearchView--main, .collection--ActivityTabSection"
+      "containerSelector": "#main-search-results"
     }
   }
 }
