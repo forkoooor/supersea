@@ -24,6 +24,7 @@ import LooksRareSvg from '../../assets/looksrare.svg'
 import X2Y2Svg from '../../assets/x2y2.svg'
 import SnipedSvg from '../../assets/sniped.svg'
 import SudoSwapSvg from '../../assets/sudoswap.svg'
+import BlurSvg from '../../assets/blur.svg'
 import GemSvg from '../../assets/gemxyz.svg'
 import EtherScanSvg from '../../assets/etherscan.svg'
 import PolygonScanSvg from '../../assets/polygonscan.svg'
@@ -393,6 +394,21 @@ const AssetInfoMenu = ({
                         onClose()
                         window.open(
                           `https://x2y2.io/eth/${address}/${tokenId}`,
+                          '_blank',
+                        )
+                      }}
+                    />
+                  )}{' '}
+                  {chain === 'ethereum' && (
+                    <TooltipIconButton
+                      label="Blur"
+                      icon={<Icon as={BlurSvg as any} />}
+                      bg="transparent"
+                      fontSize="18px"
+                      onClick={async () => {
+                        onClose()
+                        window.open(
+                          `https://blur.io/collection/${address}`,
                           '_blank',
                         )
                       }}

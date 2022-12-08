@@ -241,7 +241,7 @@ const injectSearchResults = async () => {
   const { injectionSelectors: selectors } = await fetchRemoteConfig()
   const container = document.querySelector(
     selectors.searchResults.containerSelector,
-  )!.parentElement as HTMLElement | null
+  )?.parentElement as HTMLElement | null
   if (container) {
     const collectionMenu = document.querySelector(
       selectors.searchResults.menuSelector,
@@ -276,12 +276,14 @@ const injectSearchResults = async () => {
       if (event.data.method === 'SuperSea__Next__routeChangeStart') {
         previouslyRenderedSearchResults.scrollY = event.data.params.scrollY
       } else if (event.data.method === 'SuperSea__Next__routeChangeComplete') {
-        reactContainer!.replaceWith(container)
-        if (collectionMenu) {
-          collectionMenu.classList.remove('SuperSea--tabActive')
+        if (!event.data.params.url.includes('tab=supersea')) {
+          reactContainer!.replaceWith(container)
+          if (collectionMenu) {
+            collectionMenu.classList.remove('SuperSea--tabActive')
+          }
+          window.removeEventListener('message', messageListener)
+          setCleanupActive(true)
         }
-        window.removeEventListener('message', messageListener)
-        setCleanupActive(true)
       }
     }
 
