@@ -24,6 +24,7 @@ import LooksRareSvg from '../../assets/looksrare.svg'
 import X2Y2Svg from '../../assets/x2y2.svg'
 import SnipedSvg from '../../assets/sniped.svg'
 import SudoSwapSvg from '../../assets/sudoswap.svg'
+import UniswapSvg from '../../assets/uniswap.svg'
 import BlurSvg from '../../assets/blur.svg'
 import GemSvg from '../../assets/gemxyz.svg'
 import EtherScanSvg from '../../assets/etherscan.svg'
@@ -409,6 +410,27 @@ const AssetInfoMenu = ({
                         onClose()
                         window.open(
                           `https://blur.io/collection/${address}`,
+                          '_blank',
+                        )
+                      }}
+                    />
+                  )}{' '}
+                  {chain === 'ethereum' && (
+                    <TooltipIconButton
+                      label="Uniswap"
+                      icon={
+                        <Icon
+                          as={UniswapSvg as any}
+                          position="relative"
+                          top="-2px"
+                        />
+                      }
+                      fontSize="18px"
+                      bg="transparent"
+                      onClick={async () => {
+                        onClose()
+                        window.open(
+                          `https://app.uniswap.org/#/nfts/asset/${address}/${tokenId}`,
                           '_blank',
                         )
                       }}
