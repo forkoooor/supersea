@@ -214,7 +214,10 @@ const ActivityModal = ({
   useEffect(() => {
     const messageListener = (event: MessageEvent) => {
       if (event.data.method === 'SuperSea__Next__routeChangeStart') {
-        modalProps.onClose()
+        const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`
+        if (event.data.params.url !== currentUrl) {
+          modalProps.onClose()
+        }
       }
     }
 
