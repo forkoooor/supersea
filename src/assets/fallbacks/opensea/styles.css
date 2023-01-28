@@ -8,13 +8,13 @@ article.AssetSearchList--asset .sc-1i5b3a5-1 {
   margin-bottom: 85px;
 }
 
-article.AssetSearchList--asset .sc-822f1ad8-2 {
+.SuperSea__AssetInfo--Injected .bouJdd > div {
   bottom: 0 !important;
 }
-article.AssetSearchList--asset:hover .sc-822f1ad8-2 {
+.SuperSea__AssetInfo--Injected:hover .bouJdd > div {
   bottom: 85px !important;
 }
-article.AssetSearchList--asset .sc-822f1ad8-2 button {
+.SuperSea__AssetInfo--Injected .bouJdd > div * {
   border-radius: 0px !important;
 }
 
@@ -27,6 +27,7 @@ div[role='list'] div[role='listitem'] {
 }
 
 *[data-testid='ActivityTable'] div[width='300px']:nth-child(2),
+*[data-testid='ActivityTable'] div[width='240px']:nth-child(2),
 *[data-testid='ActivityTable'] div[width='150px']:nth-child(2) {
   width: 500px !important;
   flex: 0 0 500px !important;
@@ -35,6 +36,9 @@ div[role='list'] div[role='listitem'] {
 *[data-testid='ActivityTable']
   div[role='listitem']
   div[width='300px']:nth-child(2),
+*[data-testid='ActivityTable']
+  div[role='listitem']
+  div[width='240px']:nth-child(2),
 *[data-testid='ActivityTable']
   div[role='listitem']
   div[width='150px']:nth-child(2) {

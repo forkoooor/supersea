@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "priority": 1,
+    "action": {
+      "type": "modifyHeaders",
+      "responseHeaders": [
+        {
+          "header": "content-security-policy",
+          "operation": "set",
+          "value": "base-uri 'self'; connect-src *; default-src https://fonts.gstatic.com https://opensea.io https://testnets.opensea.io https://static.opensea.io https://openseauserdata.com; img-src data: *; frame-src *; font-src data: *; manifest-src 'self' static.opensea.io; media-src *; object-src 'none'; style-src 'self' fonts.googleapis.com 'unsafe-inline';script-src * 'unsafe-inline' 'unsafe-eval';"
+        }
+      ]
+    },
+    "condition": {
+      "urlFilter": "||opensea.io",
+      "resourceTypes": ["main_frame"]
+    }
+  }
+]
