@@ -1,7 +1,7 @@
 {
   "name": "SuperSea",
   "description": "The supercharged OpenSea experience",
-  "version": "1.14.4",
+  "version": "1.14.5",
   "minimum_chrome_version": "93",
   "manifest_version": 3,
   "action": {
@@ -30,6 +30,15 @@
   "background": {
     "service_worker": "static/js/background.js"
   },
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "ruleset",
+        "enabled": true,
+        "path": "rules.json"
+      }
+    ]
+  },
   "host_permissions": [
     "https://*.opensea.io/*",
     "https://*.sudoswap.xyz/*",
@@ -49,5 +58,5 @@
       "matches": ["https://*.opensea.io/*"]
     }
   ],
-  "permissions": ["storage", "notifications"]
+  "permissions": ["storage", "notifications", "declarativeNetRequest"]
 }

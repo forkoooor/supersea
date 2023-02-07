@@ -165,7 +165,7 @@
       },
       "list": {
         "node": {
-          "selector": "*[data-testid='ActivityTable'] div[width='300px']:nth-child(2), *[data-testid='ActivityTable'] div[width='150px']:nth-child(2)",
+          "selector": "*[data-testid='ActivityTable'] div[width='300px']:nth-child(2), *[data-testid='ActivityTable'] div[width='240px']:nth-child(2), *[data-testid='ActivityTable'] div[width='150px']:nth-child(2)",
           "injectionMethod": "prepend"
         },
         "link": {
